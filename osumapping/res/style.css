@@ -48,3 +48,8 @@ p + ul, p + ol {
 img {
     width: 100%;
 }
+
+.back {
+    margin-top: 3em;
+    text-align: right;
+}
