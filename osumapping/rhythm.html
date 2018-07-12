@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="res/style.css">
+        <title> RS' Guide: Setup and Clicking Rhythm </title>
+    </head>
+    <body>
+        <div class="wrapper">
+            <h1> RS' Guide to osu! Mapping: </h1>
+            <h1> Setup and Clicking Rhythm </h1>
+            
+            <br>
+            <p> (There aren't many pictures I can put into this lesson. I promise there will be more in the future.) </p>
+            
+            <h2> Overview </h2>
+            
+            <p> Before we get started mapping a song, we need to figure out the difficulty setting and time the song. </p>
+            
+            <p> Once we're ready to start mapping, we'll look at how to choose rhythms with good clicking emphasis. </p>
+            
+            
+            <h2> Choose a song </h2>
+            
+            <p> I mentioned in the introduction that we'll be leaning how to map with "TV Size style" and that means the song we choose should be a "TV Size" song. You don't have to use a literal TV Size song, just something with pretty simple instrumentation since cimple rhythms are easier to map than complex rhythms. Also avoid songs that are too slow, since those can be difficult to map engagingly, and avoid songs that have minimal editing, such as rock songs recorded live, as these can be nearly impossible to time properly. </p>
+            
+            <p> When I work one-on-one with people, I do recommend they use literal TV Size songs as their first maps. My favorite recommendation of these is Harumachi Clover since it has rhythmic variety but no strangeness. Since this particular song has been ranked over ten times, mappers are also spoilt for choice when comparing their maps to ranked maps. </p>
+            
+            
+            <h2> Setup </h2>
+            
+            <p> If your song isn't already a map: </p>
+            <ol>
+                <li> Get the <code>.mp3</code> of the song you want to map </li>
+                <li> Open osu! </li>
+                <li> Click the giant osu! button </li>
+                <li> Click Edit </li>
+                <li> Drag and drop the <code>.mp3</code> into the game </li>
+                <li> Open the map </li>
+            </ol>
+            It's that easy.
+            
+            <p> If your song is already a map, then you'll probably want to reupload it rather than making a new diff from the existing mapset. This is partly so you don't run into the "I can't upload my map" problem and partly so it shows up when you click My Maps in song select. The <code>.mp3</code> will be in some folder in in your <code>(installation directory)/songs/</code> folder. Once you have the <code>.mp3</code>, follow the steps above. </p>
+            
+            <p> To make other diffs in your existing set: </p>
+            <ol>
+                <li> Open the set in the Edit menu (from the Play menu, you can right click the set and press the 5 button on the keyboard)</li>
+                <li> Click File in the top left </li>
+                <li> Click Create a new Difficulty </li>
+            </ol>
+            And once you've changed the settings, you may want to delete all objects and start fresh. Don't worry, this won't erase timing points.
+            
+            <p> Next, we'll have to set up metadata stuff. Don't worry too much about most of this, since we can always change it later. Just make sure your name is in the Beatmap Creator box. You'll probably want to name the diff something like <code>1 Rhythm</code> since you can make a new diff for each lesson. </p>
+            
+            <p> Next, we have to set the difficulty settings. Go into the Difficulty tab of this window. We set Circle Size to 4. Approach Rate: 7 to 9. HP Drain Rate: at least 6. Overall Difficulty, which is how precise circle clicking is: 6 to 8. I'll explain these choices after we finish setup.</p>
+            
+            <p> Go into the Design tab. Uncheck Enable Countdown. Check Widescreen Support. </p>
+            
+            <p> Go into the Advanced tab. Set Stack Leniency to 3. </p>
+            
+            <p> Click OK at the bottom. We'll come back to this screen later, but for now, this is good enough. </p>
+            
+            
+            <h2> Why use CS4 and AR9? </h2>
+            
+            <p> Before I answer this question, I'll note that these difficulty settings make for good starts to Hard and Insane diffs. Setting our target diff like this allows us to take advantage of variations in the song's rhythms, but doesn't force us to make hard patterns. However, these settings won't work in all diffs. Generally, lower diffs have lower numbers for all of these settings. </p>
+            
+            <p> It's probably pretty clear why we always set HP and OD to be the same few comfortable values every time. But why doesn't everyone use CS7? AR3? </p>
+            
+            <p> AR is the more flexible of the two. Since especially fast maps require AR10 to even be readable, and since more and more maps are using decimal AR between 9 and 10, players are becoming better at reading any high AR. Very low AR, on the other hand, can be difficult for experienced players to read since it causes objects to obscure later objects. </p>
+            
+            <p> CS is more interesting. Older maps would set CS higher to make aim harder, which made the map harder. Newer maps sometimes do this as well, but mappers have come to realize that CS much higher or lower than 4 require different kinds of patterning so it doesn't just look like the mapper made an edgy decision to be "unique." </p>
+            
+            
+            <h2> Timing </h2>
+            
+            <p> This is probably the first hurdle many mappers hit when making their first maps. <strong>An incorrectly timed song necessarily leads to a garbage map,</strong> since objects will not be at the right times. </p>
+            
+            <p> By our song choice, we should have avoided any multi-BPM songs, and we'll probably end up with a whole number BPM. If you later choose maps with strange timing (including BPM not a whole number), you'll want to check it carefully to make sure your timing is definitely supposed to be weird. </p>
+            
+            <p> If you stole the song from another map and that map has good timing, you can just open that map up, press F6 to open the timing panel, and steal all the red (uninherited) timing points. </p>
+            
+            <p> Otherwise, follow these steps: </p>
+            <ol>
+                <li> Open the black Timing tab (not the light gray one) and play the song from the beginning. </li>
+                <li> When you'd normally tap your foot in time to the music, tap the T button on your keyboard. Do this until the BPM display stops changing. That's probably your BPM. </li>
+                <li> Offset will probably be off by a bit, so go to a stable part of the song and add a few circles, then play the song at 25% speed. Adjust the offset until these circles' hitsounds line up with the song's sounds. </li>
+                <li> Recheck your BPM by ensuring that it's on the beats at both the beginning and end of the song. </li>
+                <li> (Delete the circles from step 3.) </li>
+            </ol>
+            
+            <p> You can usually get a second opinion on your timing by asking another mapper you know, or by asking the <code>#modhelp</code> channel. Timing checks are fast, but retiming is slow, so be clear that you're only looking for a check, and people shouldn't be too averse to helping you. </p>
+            
+            
+            <h2> Final Editor Settings </h2>
+            
+            <p> In most songs, you'll want to <strong>set Beat Snap Divisor to 1/4</strong> since very few songs use denser rhythms or triplet rhythms. Turn off Grid Snap and Distance Snap until you need them, and you'll want Lock Notes off until you hitsound. All these settings are somewhere on the right side of the screen. </p>
+            
+            
+            <h2> Clicking Rhythms </h2>
+            
+            <p> Clicking is fun. It's what makes osu! a rhythm game and why Relax is such a different experience from NoFail. Because it's so important to players, it's important to mappers. Mappers use comfortable clicking rhythms to give the player a feeling of control, and uncomfortable clicking rhythms to put the player on edge. </p>
+            
+            <p> To start figuring out clicking rhythm, we have to first figure out what parts of the song we want to follow. In sections where the drums are stable, following the drums will allow us to create predictable rhythms. However, we need to make sure we don't sacrifice the other sounds in the music, as these add variety. </p>
+            
+            <p> The big rule of thumb is that we should always <strong>follow the most important rhythms in the music with clickable objects.</strong> The most important rhythms are usually on the most important sounds, so pairing the strong sounds in the music with clicking will usually create good rhythms. </p>
+            
+            <p> For now, just placing circles anywhere will work, since we're not really thinking about what the positions of objects means. If you'd like, you can place them all in the center or alternate between two spots, which will make the map potentially playable (but not necessarily fun). </p>
+            
+            
+            <h2> 1, 3, 2 & 4 </h2>
+            
+            <p> I'll let pishifat explain this concept. </p>
+            
+            <div class="video"> <iframe width="640" height="360" src="https://www.youtube.com/embed/qmCEfh865b4" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen> </iframe> </div>
+            
+            <p> If we're following the song when making rhythms, we should naturally get a clicking rhythm that emphasizes these notes, from most likely to least likely: </p>
+            <ol>
+                <li> Big (first) white tick </li>
+                <li> Third white tick </li>
+                <li> Second and fourth white ticks </li>
+                <li> Red ticks </li>
+                <li> Blue ticks </li>
+                <li> Yellow and purple ticks</li>
+                <li> Gray ticks </li>
+            </ol>
+            
+            <p> However, there are many cases in which our rhythms won't follow this, and that's okay. We'll come back to that in the next lesson. </p>
+            
+            
+            <h2> Overmapping </h2>
+            
+            <p> At this point, it's worth taking a moment to discuss overmapping. Mappers generally agree that overmapping happens if a song has no sound where the map has an object. Alongside undermapping, it's one of the cardinal sins when choosing rhythm. </p>
+            
+            <p> Except, overmapping is an extremely powerful tool, and while its abuse can lead to completely unplayable maps, it also does nobody any good to be afraid of it. <strong>Overmapping should be used only in certain situations.</strong> One such situation is when it would simplify rhythm that would otherwise be confusing. Especially in lower diffs, simpler rhythms are easier to manage for both the player and mapper.</p>
+            
+            <p> We'll cover overmapping for emphasis, which is also acceptable when used peroperly, in lesson three. </p>
+            
+            
+            <h2> Mixing it up </h2>
+            
+            <p> If you're mapping a literal TV Size song, you'll notice that the clicking rhythm is extremely boring 1/2 spam or similar. <s>This represents the song because the song is boring.</s> This is okay. In the next two lessons, we'll look into some ways of using clicking rhythms to engage the player while still keeping with the base rhythms of the song. </p>
+            
+            <p> Because you're using a skin that supports combos and combo colors, you'll notice that the map is, at this point, one long combo. Most of the time, combos more than 8 objects long are discouraged, except in streams, where combos of 16 are acceptable. Otherwise, we'll place <strong>NCs (New Combos) on the most prominent sounds, which are usually the sounds that begin new phrases of music or anything on a big white tick.</strong> </p>
+            
+            <p> (If you're mapping Harumachi Clover, NC on all the sounds with gaps before them, as well as on any big white tick with multiple circles before it.) </p>
+            
+            
+            <h2> Conclusion </h2>
+            
+            <p> We now have a properly timed map with good difficulty settings. We've figured out our map's basic rhythm and placed circles on those spots, with NCs in proper places. </p>
+            
+            <p> In the next lesson, we'll place sliders where they'll make the map more interesting to play, and use them to emphasize rhythms other than the main instrument. </p>
+        </div>
+        
+        <div class="wrapper">
+            <h2 class="nospace"> Miscellaneous </h2>
+            
+            <p> <a href="https://osu.ppy.sh/u/5364763">Nao Tomori</a> (formerly Naotoshi) has ranked Harumachi Clover twice, as well as two remixes, and one anthology that included the song. As far as I can tell, he doesn't want to rank any more sets of it, but I also thought that before he started the most recent one, so he'll probably end up ranking it a few more times. </p>
+            
+            <p> I mentioned extremely low AR, but it doesn't actually stop at 0. AR(-infinity)  causes all objects to appear at the beginning of the map. Famously, this was used in a series of three plays by <a href="https://www.youtube.com/watch?v=jfvz0PBtW5Q">Mafham</a> then <a href="https://www.youtube.com/watch?v=1sdUbSPFy6k">-GN</a> then <a href="https://www.youtube.com/watch?v=G_d7Llf8xEU">-PC</a>. </p>
+            
+            <p> The only mapper I can remember being known for weird CS is <a href="https://osu.ppy.sh/u/1287964">Irreversible</a>, who's used CS7 in a few of his topdiffs. </p>
+            
+            <p> A map famous for having a long combo is <a href="https://osu.ppy.sh/u/2523533">UndeadCapulet</a>'s map of <a href="https://osu.ppy.sh/s/725171">Rendezvous</a>, the topdiff of which has a combo of 85 notes. Soon after it was ranked, it became the lowest rated osu!std map of all time. Please, NC responsibly. </p>
+        </div>
+    </body>
+</html>
