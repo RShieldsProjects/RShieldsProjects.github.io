@@ -41,8 +41,9 @@ p + ul, p + ol {
 
 .video {
     display: block;
-    width: 640px;
+    width: 560px;
     margin: 0 auto;
+    padding: 0;
 }
 
 img {
