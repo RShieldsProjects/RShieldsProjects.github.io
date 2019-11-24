@@ -5,7 +5,7 @@ var views = -1;
 function avgdespacito() {
     // World Pop data
     var worldPopRequest = new XMLHttpRequest();
-    worldPopRequest.open("GET", "http://api.population.io:80/1.0/population/World/today-and-tomorrow/", true);
+    worldPopRequest.open("GET", "https://api.population.io:80/1.0/population/World/today-and-tomorrow/", true);
     worldPopRequest.onreadystatechange = function() {
         //console.log(worldPopRequest)
         if (worldPopRequest.readyState == 4 && worldPopRequest.status == 200) {
