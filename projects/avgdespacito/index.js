@@ -19,7 +19,7 @@ function avgdespacito() {
     
     // Youtube data
     var viewsRequest = new XMLHttpRequest();
-    viewsRequest.open("GET", "https://www.googleapis.com/youtube/v3/videos?part=statistics&id=kJQP7kiw5Fk&key=AIzaSyBuIpnxdPViYmARfrMgM9Us79yMOLhlHEk", true);
+    viewsRequest.open("GET", "[this link was dead]", true);
     viewsRequest.onreadystatechange = function() {
         if (viewsRequest.readyState == 4 && viewsRequest.status == 200) {
             views = JSON.parse(viewsRequest.responseText).items[0].statistics.viewCount;
