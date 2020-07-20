@@ -1,0 +1,21 @@
+body {
+  background-color: #420dab;
+  font-family: arial;
+}
+
+.wrapper {
+  background-color: #dab420;
+  margin: 100px 200px;
+  padding: 50px;
+}
+
+a {
+  background-color: #eee;
+  padding: 8px;
+  margin: 2px;
+}
+
+h2 {
+  margin-top: 3em;
+  margin-bottom: 0;
+}

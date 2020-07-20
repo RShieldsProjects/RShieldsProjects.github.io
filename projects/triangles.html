@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+
+<html>
+  <head>
+    <title>Triangles</title>
+    <style>
+      input {
+        width: 1080px;
+      }
+      canvas {
+        border: 1px solid black;
+      }
+    </style>
+    <script>
+      // a,b are arrays [x,y]
+      function dist(a, b) {
+        const dx = b[0] - a[0];
+        const dy = b[1] - a[1];
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+
+      // How far the next point is from the previous
+      var step = 0.01;
+
+      // Finds point on the line ab, step length from a
+      function makeNext(a, b) {
+        const dx = b[0] - a[0];
+        const dy = b[1] - a[1];
+        const d = dist(a, b)
+        return [a[0] + dx / d * step, a[1] + dy / d * step];
+      }
+
+      // Will a draw be done next frame?
+      var queued = false;
+
+      // Handles slider stuff and queues draw
+      function queueDraw(slider) {
+        step = Math.exp(-slider);
+        if (!queued) {
+          queued = true;
+          window.requestAnimationFrame(draw);
+        }
+      }
+
+      // Canvas and context for drawing
+      var cvs;
+      var ctx;
+
+      // Draw triangles. This is expensive!
+      function draw() {
+        // Expensive function so handle this first
+        queued = false;
+
+        ctx.clearRect(0, 0, cvs.width, cvs.height);
+
+        // Starting value: Large triangle has these points
+        let tri = [[0,0],[0.5, 0.866025403784],[1,0]];
+        let count = 0;
+        do {
+          // Draw. Magic numbers are offsets to fit the triangles nicely into the canvas
+          ctx.beginPath();
+          ctx.moveTo(tri[0][0] * 1000 + 40, 890 - tri[0][1] * 1000);
+          ctx.lineTo(tri[1][0] * 1000 + 40, 890 - tri[1][1] * 1000);
+          ctx.lineTo(tri[2][0] * 1000 + 40, 890 - tri[2][1] * 1000);
+          ctx.lineTo(tri[0][0] * 1000 + 40, 890 - tri[0][1] * 1000);
+          ctx.stroke();
+
+          // Get the next ready
+          tri = [makeNext(tri[0], tri[1]), makeNext(tri[1], tri[2]), makeNext(tri[2], tri[0])];
+
+          // For safety: prevents very very long draw calls
+          count++;
+        // Check if too many draw calls have been made or the next triangle would be too small
+        } while (count < 1000 && dist(tri[0], tri[1]) > step)
+      }
+
+      // Init
+      window.onload = function() {
+        document.getElementById("slider").oninput = function() {
+          queueDraw(this.value)
+        };
+
+        cvs = document.getElementById("cvs");
+        ctx = cvs.getContext("2d");
+
+        // 2 just looks nice
+        queueDraw(2);
+      }
+    </script>
+  </head>
+  <body>
+    <input id="slider" type="range" min="0.6" max="5.3" value="2" step="0.01" autocomplete="off" /> <br>
+    <canvas id="cvs" height="900" width="1080"></canvas>
+  </body>
+</html>
