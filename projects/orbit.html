@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>IDK fam</title>
+    <style>
+      input {
+        width: 1200px;
+      }
+      div {
+        position: relative;
+      }
+      canvas {
+        position: absolute;
+        top: 0px;
+        left: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    Note: Over time, the planet's orbit will change. This is caused by the physics simulation being imperfect, not by the math being wrong.
+    <input id="slider" type="range" min="1" max="2" value="1.5" step="0.01" autocomplete="off" /> <br>
+    <div>
+      <canvas id="cvs2" width=1200 height=800></canvas>
+      <canvas id="cvs1" width=1200 height=800></canvas>
+    </div>
+    <script>
+      const slider = document.getElementById('slider');
+      // For dots, clear every frame
+      const cvs1 = document.getElementById('cvs1');
+      const ctx1 = cvs1.getContext('2d');
+      // For paths, clear on reset
+      const cvs2 = document.getElementById('cvs2');
+      const ctx2 = cvs2.getContext('2d');
+
+      const centerX = cvs1.width / 2;
+      const centerY = cvs1.height / 2;
+      const scale = 200;
+
+      const GM = 0.01;
+      const timeScale = 0.3;
+      const steps = 10000;
+
+      var currHalfA = 0;
+      var starPos = [1,0];
+      var planetPos = [1,0];
+      var planetVel = [0,1];
+
+      function drawCircle(pos, radius) {
+        ctx1.beginPath();
+        ctx1.arc(pos[0] * scale + centerX, -pos[1] * scale + centerY, radius * scale, 0, 2 * Math.PI, false);
+        ctx1.fill();
+        ctx1.stroke();
+      }
+
+      function drawPath(pos1, pos2) {
+        ctx2.beginPath();
+        ctx2.moveTo(pos1[0] * scale + centerX, -pos1[1] * scale + centerY);
+        ctx2.lineTo(pos2[0] * scale + centerX, -pos2[1] * scale + centerY);
+        ctx2.stroke();
+      }
+
+      function reset(halfA) {
+        currHalfA = halfA;
+
+        ctx2.fillRect(0, 0, cvs2.width, cvs2.height);
+
+        starPos = [-Math.sqrt(halfA * halfA - 1), 0];
+        planetPos = [halfA, 0];
+        let r = planetPos[0] - starPos[0];
+        planetVel = [0, Math.sqrt(GM * (2 / r - 1 / halfA))];
+
+        ctx1.fillStyle = 'yellow';
+        drawCircle(starPos, 0.1);
+        ctx1.fillStyle = 'white';
+        drawCircle(planetPos, 0.05);
+      }
+
+      function sqDist(pos1, pos2) {
+        let dx = pos1[0] - pos2[0];
+        let dy = pos1[1] - pos2[1];
+        return dx * dx + dy * dy;
+      }
+
+      function dir(pos1, pos2) {
+        let unscaled = [pos2[0] - pos1[0], pos2[1] - pos1[1]];
+        let mag = Math.sqrt(sqDist(pos1, pos2));
+        return [unscaled[0] / mag, unscaled[1] / mag];
+      }
+
+      function updatePos() {
+        let oldPos = [planetPos[0], planetPos[1]];
+
+        for (let i = 0; i < steps; i++) {
+          let accelMag = -GM / sqDist(starPos, planetPos);
+          let accelDir = dir(starPos, planetPos);
+          let newVel = [planetVel[0] + accelDir[0] * accelMag * timeScale / steps, planetVel[1] + accelDir[1] * accelMag * timeScale / steps];
+          let newPos = [planetPos[0] + (planetVel[0] + newVel[0]) / 2 * timeScale / steps, planetPos[1] + (planetVel[1] + newVel[1]) / 2 * timeScale / steps];
+
+          planetPos = newPos;
+          planetVel = newVel;
+        }
+
+        ctx2.strokeStyle = 'red';
+        drawPath(oldPos, planetPos);
+      }
+      
+      function step() {
+        ctx1.clearRect(0, 0, cvs1.width, cvs1.height);
+
+        if (slider.value != currHalfA) {
+          reset(parseFloat(slider.value));
+        }
+
+        updatePos();
+
+        ctx1.fillStyle = 'yellow';
+        drawCircle(starPos, 0.1);
+        ctx1.fillStyle = 'white';
+        drawCircle(planetPos, 0.05);
+
+        window.requestAnimationFrame(step);
+      }
+
+      window.requestAnimationFrame(step);
+    </script>
+  </body>
+</html>
