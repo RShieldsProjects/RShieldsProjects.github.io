@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>IDK fam</title>
+    <title>Elliptical Orbit Simulation</title>
     <style>
       input {
         width: 1200px;
@@ -38,7 +38,7 @@
 
       const GM = 0.01;
       const timeScale = 0.3;
-      const steps = 10000;
+      const stepScale = 300000;
 
       var currHalfA = 0;
       var starPos = [1,0];
@@ -90,11 +90,14 @@
       function updatePos() {
         let oldPos = [planetPos[0], planetPos[1]];
 
+        let steps = stepScale * sqDist([0,0], planetVel);
+        let dt = timeScale / steps;
+
         for (let i = 0; i < steps; i++) {
           let accelMag = -GM / sqDist(starPos, planetPos);
           let accelDir = dir(starPos, planetPos);
-          let newVel = [planetVel[0] + accelDir[0] * accelMag * timeScale / steps, planetVel[1] + accelDir[1] * accelMag * timeScale / steps];
-          let newPos = [planetPos[0] + (planetVel[0] + newVel[0]) / 2 * timeScale / steps, planetPos[1] + (planetVel[1] + newVel[1]) / 2 * timeScale / steps];
+          let newVel = [planetVel[0] + accelDir[0] * accelMag * dt, planetVel[1] + accelDir[1] * accelMag * dt];
+          let newPos = [planetPos[0] + (planetVel[0] + newVel[0]) / 2 * dt, planetPos[1] + (planetVel[1] + newVel[1]) / 2 * dt];
 
           planetPos = newPos;
           planetVel = newVel;
