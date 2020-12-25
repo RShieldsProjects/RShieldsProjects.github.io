@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Quadtree</title>
+  </head>
+  <body>
+    <canvas id="cvs" height="800" width="800"></canvas> <br>
+    <button id="add">Add Particle</button>
+    <script>
+      const cvs = document.getElementById("cvs");
+      const ctx = cvs.getContext("2d");
+      ctx.lineWidth = 1;
+
+      const particlesPerNode = 5;
+
+      class Particle {
+        constructor(pos) {
+          this.pos = pos
+        }
+
+        draw() {
+          ctx.fillStyle = "white";
+          ctx.fillRect(this.pos[0] - 1, this.pos[1] - 1, 2, 2);
+        }
+      }
+
+      class Node {
+        constructor(pos, size) {
+          this.isSplit = false;
+          this.particles = [];
+          this.pos = pos;
+          this.size = size;
+        }
+
+        draw() {
+          if (this.isSplit) {
+            this.northwest.draw();
+            this.northeast.draw();
+            this.southwest.draw();
+            this.southeast.draw();
+          } else {
+            let fullness = this.particles.length / particlesPerNode;
+            ctx.strokeStyle = "hsl(" + (1 - fullness) * 120 + ", 100%, 50%)";
+            ctx.strokeRect(this.pos[0] + 0.5, this.pos[1] + 0.5, this.size - 1, this.size - 1);
+
+            for (let p of this.particles) {
+              p.draw();
+            }
+          }
+        }
+
+        addParticle(particle) {
+          if (this.isSplit) {
+            let newSize = this.size / 2;
+
+            if (particle.pos[0] > this.pos[0] + newSize) {
+              if (particle.pos[1] > this.pos[1] + newSize) {
+                this.northeast.addParticle(particle);
+              } else {
+                this.southeast.addParticle(particle);
+              }
+            } else {
+              if (particle.pos[1] > this.pos[1] + newSize) {
+                this.northwest.addParticle(particle);
+              } else {
+                this.southwest.addParticle(particle);
+              }
+            }
+          } else {
+            this.particles.push(particle)
+
+            if (this.particles.length > particlesPerNode){
+              this.split();
+            }
+          }
+        }
+
+        split() {
+          this.isSplit = true;
+
+          let newSize = this.size / 2;
+          this.northwest = new Node([this.pos[0], this.pos[1] + newSize], newSize);
+          this.northeast = new Node([this.pos[0] + newSize, this.pos[1] + newSize], newSize);
+          this.southwest = new Node([this.pos[0], this.pos[1]], newSize);
+          this.southeast = new Node([this.pos[0] + newSize, this.pos[1]], newSize);
+
+          for (let p of this.particles) {
+            this.addParticle(p);
+          }
+          this.particles = null;
+        }
+      }
+
+      function randomPos() {
+        return [Math.floor(Math.random() * cvs.height), Math.floor(Math.random() * cvs.height)];
+      }
+
+      // Init
+      const root = new Node([0,0], cvs.height);
+
+      for (let i = 0; i < 20; i++) {
+        root.addParticle(new Particle(randomPos()));
+      }
+
+      ctx.fillRect(0, 0, cvs.width, cvs.height);
+      root.draw();
+
+      document.getElementById("add").onclick = function() {
+        root.addParticle(new Particle(randomPos()));
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, cvs.width, cvs.height);
+        root.draw();
+      }
+    </script>
+  </body>
+</html>
