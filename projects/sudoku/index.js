@@ -74,6 +74,9 @@ function reset() {
   for (td of tds) {
     if (td.p.textContent === null || td.p.textContent === "") {
       td.values = [1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9, 1/9];
+    } else {
+      td.values = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+      td.values[Number(td.p.textContent) - 1] = 1;
     }
   }
   
