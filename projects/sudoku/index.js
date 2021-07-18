@@ -7,7 +7,9 @@ function setHighlight(id) {
   if (highlight != -1)
     tds[highlight].classList.remove("highlight");
   highlight = id;
-  tds[highlight].classList.add("highlight");
+  if (highlight != -1)
+    tds[highlight].classList.add("highlight");
+  render();
 }
 
 function handleKeyPress(e) {
@@ -55,6 +57,7 @@ function makeTable(table) {
 }
 
 function solveClick() {
+  setHighlight(-1);
   if (requestId !== null) {
     window.cancelAnimationFrame(requestId);
     requestId = null;
