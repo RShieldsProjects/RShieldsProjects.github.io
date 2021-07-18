@@ -167,6 +167,12 @@ function render() {
         td.spans[i].style.color = "rgba(0, 0, 255, " + td.values[i] + ")";
       }
     }
+    
+    if (td.classList.contains("highlight")) {
+      td.p.style.backgroundColor = "#0000";
+    } else {
+      td.p.style.backgroundColor = "hsl(" + (Math.max(...td.values) - 1/9) * 9/8 * 120 + ", 100%, 80%)";
+    }
   }
 }
 
