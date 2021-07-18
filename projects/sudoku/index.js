@@ -154,8 +154,8 @@ function solve() {
     }
   }
   
-  solveClick();
   checkValid();
+  solveClick();
 }
 
 function render() {
@@ -208,7 +208,7 @@ function checkValid() {
   if (Math.max(...flatRows) === 1 && Math.min(...flatRows) === 1 &&
       Math.max(...flatCols) === 1 && Math.min(...flatCols) === 1 &&
       Math.max(...flatSsqs) === 1 && Math.min(...flatSsqs) === 1) {
-    alert("Correct solution found");
+    alert("Correct solution found. Steps: " + iters);
   } else {
     alert("Problem occurred");
   }
