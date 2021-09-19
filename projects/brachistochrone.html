@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+
+<html>
+  <head>
+    <title>Brachistochrone</title>
+    <style>
+      body {
+        padding: 2em;
+      }
+      p {
+        height: 1em;
+      }
+    </style>
+    <script>
+      // for display
+      var cvs;
+      var ctx;
+      const HEIGHT = 400;  // height of ramp, not height of canvas
+      const WIDTH = 1200;
+      var cyclesDisplay;
+      var tDisplay;
+
+      // for calculation
+      const MAX_CYCLES = 2000;
+      var cycles = 0;
+      const MAX_POINTS = 2400;
+      var points = 3;
+      var currArr;
+      var currTime;
+
+      // make defaults
+      function init() {
+        currArr = Array(points);  // length constructor
+        for (let i = 0; i < points; i++)
+          currArr[i] = (1 - i/(points-1)) * HEIGHT;
+
+        currTime = calcTime(currArr);
+        draw();
+      }
+
+      // start running
+      function start() {
+        if (cycles === 0)
+          window.requestAnimationFrame(run);
+      }
+
+      // attempt to make the curve better
+      function run() {
+        // stopping conditions: too many cycles or too many points
+        cycles++;
+        if (cycles > MAX_CYCLES || points > MAX_POINTS) {
+          cyclesDisplay.innerHTML += " (done)";
+          return;
+        }
+
+        // attempt to make the curve better
+        let tries = 0;
+        let newArr = Array(points);  // length constructor
+        newArr[0] = HEIGHT;
+        newArr[points - 1] = 0;
+        let newTime = currTime;
+        while (newTime >= currTime) {
+          tries++;
+          // If it looks like we're not getting better with this set of points,
+          // add a point between each pair. Try more times as the cycle count
+          // gets large, since we are really getting close.
+          if (tries > cycles * 10 + 100) {
+            points = points * 2 - 1;
+            newArr = Array(points);
+            for (let i = 0; i < points; i++)
+              newArr[i] = i % 2 == 0 ? currArr[i/2] :
+                  (currArr[Math.floor(i/2)] + currArr[Math.ceil(i/2)]) / 2;
+            newTime = calcTime(newArr);
+            break;
+          }
+
+          // first try big moves, then smaller
+          // (formula determined empirically)
+          let rate = 2 * HEIGHT / (tries + 100);
+          for (let i = 1; i < points - 1; i++)
+            newArr[i] = clamp(currArr[i] + pseudonormalRandom() * rate);
+
+          newTime = calcTime(newArr);
+        }
+        // update curve
+        currArr = newArr;
+        currTime = newTime;
+
+        // display
+        updateSpans();
+        draw();
+
+        // run again
+        window.requestAnimationFrame(run);
+      }
+
+      // find the time it takes a ball to roll down the curve
+      function calcTime(pointArr) {
+        // total time
+        let time = 0;
+        // current velocity
+        let vel = [0, 0];
+
+        // for each slope
+        for (let i = 1; i < points; i++) {
+          // get the info of this slope
+          let delta = [WIDTH/(points-1), pointArr[i] - pointArr[i-1]];
+          let magDelta = magnitude(delta);
+          let normDelta = [delta[0] / magDelta, delta[1] / magDelta];
+
+          // convert momentum from previous slope
+          // ||new vel|| = (previous velocity) dot (normalized new slope)
+          let dot = vel[0] * normDelta[0] + vel[1] * normDelta[1];
+          if (dot < 0) return Number.POSITIVE_INFINITY;  // ball stops
+          vel = [dot * normDelta[0], dot * normDelta[1]];
+
+          // get new velocity
+          // g = -981 cm/s^2, sin(theta) = normDelta[1]
+          // then split into horizontal and vertical components
+          accel = [-981 * normDelta[1] * normDelta[0], -981 * normDelta[1] * normDelta[1]];
+          // kinematics: v_f^2 = v_0^2 + 2 * a * Dp
+          let newVel = [Math.sqrt(vel[0] * vel[0] + 2 * accel[0] * delta[0]),
+              Math.sqrt(vel[1] * vel[1] + 2 * accel[1] * delta[1]) * Math.sign(delta[1])];
+
+          // add time
+          time += 2 * delta[0] / (vel[0] + newVel[0]);
+          // update velocity
+          vel = newVel;
+        }
+
+        // final check to make sure the time was successfully calculated,
+        // otherwise return infinity
+        return isNaN(time) ? Number.POSITIVE_INFINITY : time;
+      }
+
+      function magnitude(v) {
+        return Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+      }
+
+      // uniform sum, n = 3
+      function pseudonormalRandom() {
+        return (Math.random() + Math.random() + Math.random() - 1.5) / 1.5;
+      }
+
+      // clamps n between -HEIGHT and HEIGHT
+      function clamp(n) {
+        return n < -HEIGHT ? -HEIGHT : (n > HEIGHT ? HEIGHT : n);
+      }
+
+      // draws the canvas
+      function draw() {
+        // clear
+        ctx.clearRect(0, 0, WIDTH, HEIGHT * 2);
+        //ctx.fillStyle = "#FFFFFF";
+        //ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        
+        // draw triangle
+        ctx.strokeStyle = "#0000AA";
+        ctx.beginPath();
+        ctx.moveTo(1, 0);
+        ctx.lineTo(1, HEIGHT);
+        ctx.lineTo(WIDTH, HEIGHT);
+        ctx.closePath();
+        ctx.stroke();
+        
+        // draw curve
+        ctx.strokeStyle = "#CC0000";
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        for (let i = 1; i < points; i++) {
+          ctx.lineTo(i/(points-1) * WIDTH, HEIGHT - currArr[i]);
+        }
+        ctx.stroke();
+      }
+
+      // update stats at the bottom
+      function updateSpans() {
+        cyclesDisplay.innerHTML = "cycle: " + cycles;
+        tDisplay.innerHTML = "t = " + currTime;
+      }
+
+      window.onload = function() {
+        document.getElementById("start").onclick = start;
+        cyclesDisplay = document.getElementById("cycles");
+        tDisplay = document.getElementById("t");
+
+        cvs = document.getElementById("cvs");
+        ctx = cvs.getContext("2d");
+
+        init();
+      }
+    </script>
+  </head>
+  <body>
+    <p>ramp size: 12m x 4m</p>
+    <button id="start">Start</button><br>
+    <p id="cycles"></p>
+    <p id="t"></p><br>
+    <canvas id="cvs" width="1200" height="600"></canvas>
+  </body>
+</html>
