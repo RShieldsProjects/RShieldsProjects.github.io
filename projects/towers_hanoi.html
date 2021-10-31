@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+
+<html>
+  <head>
+    <title>Towers of Hanoi</title>
+    <style>
+      canvas {
+        border: 1px solid black;
+      }
+    </style>
+    <script>
+      var moveText;
+
+      // Canvas and context for drawing
+      var cvs;
+      var ctx;
+
+      var screenWidth;
+      var screenHeight;
+      const topGap = 100;
+
+      var towers;
+      var discCount;
+      var moves = [];
+
+      var animationHandle = 0;
+      var waitTime = 1;
+      var waited = 0;
+
+      function initDiscs(newDiscCount) {
+        discCount = newDiscCount;
+        towers = [Array(discCount), [], []];
+        for (let i = 0; i < discCount; i++) {
+          towers[0][i] = discCount - i;
+        }
+        draw();
+      }
+
+      function initMoves(str) {
+        moves = str.trim().split("\n").map(
+            s => s.split(" ").map(
+            n => parseInt(n) - 1));
+        if (animationHandle !== 0) {
+          window.cancelAnimationFrame(animationHandle);
+          animationHandle = 0;
+        }
+        waited = 0;
+      }
+
+      function iterate() {
+        // no more moves
+        if (moves.length == 0) return;
+
+        // wait a certain amount of time, in accordance with the speed
+        if (waited < waitTime) {
+          waited++;
+          animationHandle = window.requestAnimationFrame(iterate);
+          return;
+        }
+        waited -= waitTime;
+
+        let move = moves.shift();
+        // can't move from empty tower
+        if (towers[move[0]].length == 0) return;
+        // can't place on smaller
+        if (towers[move[1]].length > 0
+                && towers[move[1]][towers[move[1]].length - 1]
+                < towers[move[0]][towers[move[0]].length - 1])
+            return;
+
+        // must be a legal move, so do it
+        towers[move[1]].push(towers[move[0]].pop());
+        draw();
+
+        animationHandle = window.requestAnimationFrame(iterate);
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, screenWidth, screenHeight);
+
+        let discHeight = (screenHeight - topGap) / discCount;
+        let widthMultiplier = (screenWidth - 110) / 3 / discCount;
+
+        for (let i = 0; i < 3; i++) {
+          let towerX = (2*i + 1) * screenWidth / 6;
+
+          ctx.fillStyle = "black";
+          drawRect(10, screenHeight - topGap/50,
+              towerX, screenHeight/2 + topGap/2);
+
+          for (let j = 0; j < towers[i].length; j++) {
+            let hue = Math.floor(towers[i][j] / discCount * 360);
+            ctx.fillStyle = "hsl(" + hue + ", 100%, 50%)";
+            let discWidth = towers[i][j] * widthMultiplier + 10;
+            let discY = screenHeight - (j + 0.5) * discHeight;
+            drawRect(discWidth, discHeight, towerX, discY);
+          }
+        }
+      }
+
+      function drawRect(width, height, centerX, centerY) {
+        ctx.fillRect(centerX - width/2, centerY - height/2, width, height);
+      }
+
+      // Init
+      window.onload = function() {
+        cvs = document.getElementById("cvs");
+        ctx = cvs.getContext("2d");
+        screenWidth = cvs.width;
+        screenHeight = cvs.height;
+
+        let discCountInput = document.getElementById("discCount");
+        discCountInput.oninput = function() {
+          initDiscs(this.value);
+        }
+
+        moveText = document.getElementById("moveText");
+
+        document.getElementById("run").onclick = function() {
+          initDiscs(discCount);
+          initMoves(moveText.value);
+          iterate();
+        }
+
+        document.getElementById("speed").oninput = function() {
+          waitTime = 1 << (7 - this.value);
+        }
+
+        initDiscs(discCountInput.value);
+      }
+    </script>
+  </head>
+  <body>
+    <canvas id="cvs" height="500" width="1080"></canvas><br>
+    <p>Number of discs: <input type="number" id="discCount" min="3" max="10" value="5"></p>
+    <p>Enter a list of moves, one per line. For example, <code>1 3</code> moves the top disc of the left pile to the top of the right pile.</p>
+    <textarea id="moveText"></textarea><br>
+    <button id="run">Run</button> Speed: <input type="range" id="speed" min="0" max="7">
+  </body>
+</html>
