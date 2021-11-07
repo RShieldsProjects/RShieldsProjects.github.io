@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+
+<html>
+  <head>
+    <title>Towers of Hanoi</title>
+    <style>
+      canvas {
+        border: 1px solid black;
+      }
+    </style>
+    <script src="index.js"></script>
+    <script src="render.js"></script>
+  </head>
+  <body>
+    <canvas id="cvs" height="500" width="1080"></canvas><br>
+    <p>Number of discs: <input type="number" id="discCount" min="3" max="10" value="5"></p>
+    <p>Enter a list of moves, one per line. For example, <code>1 3</code> moves the top disc of the left pile to the top of the right pile.</p>
+    <textarea id="moveText"></textarea><br>
+    <button id="run">Run</button> Speed: <input type="range" id="speed" min="0" max="7">
+  </body>
+</html>
