@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+
+<html>
+  <head>
+    <title>Towers of Hanoi</title>
+    <style>
+      canvas {
+        border: 1px solid black;
+      }
+    </style>
+    <script src="utils.js"></script>
+    <script src="qlearning.js"></script>
+    <script src="render.js"></script>
+  </head>
+  <body>
+    <canvas id="cvs" height="500" width="1080"></canvas><br>
+    
+    <button id="shuffle">Shuffle</button>
+    <button id="train">Train</button>
+    <button id="run">Run</button>
+    Speed: <input type="range" id="speed" min="0" max="7">
+  </body>
+</html>
