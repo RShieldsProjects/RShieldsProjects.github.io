@@ -93,5 +93,10 @@ window.onload = function() {
   ctx = cvs.getContext("2d");
   screenWidth = cvs.width;
   screenHeight = cvs.height;
+  
+  document.getElementById("speed").oninput = function() {
+    waitTime = 1 << (7 - this.value);
+  }
+  
   init();
 }

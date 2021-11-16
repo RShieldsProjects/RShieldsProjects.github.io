@@ -121,9 +121,5 @@ function init() {
     iterate();
   }
 
-  document.getElementById("speed").oninput = function() {
-    waitTime = 1 << (7 - this.value);
-  }
-
   initShuffle(discCountQ);
 }
