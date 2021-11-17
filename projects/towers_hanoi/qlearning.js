@@ -54,38 +54,6 @@ function lerp(a, b, t) {
   return a * (1 - t) + b * t;
 }
 
-function getNewPosition(position, move) {
-  let start = tableMoves[move][0];
-  let end = tableMoves[move][1];
-  
-  let iterPos = position;
-  for (let i = 0; i < discCountQ; i++) {
-    discLoc = iterPos % 3 + 1;
-    if (discLoc === start) {
-      return position + (end - start) * (3 ** i);
-    }
-    iterPos = Math.floor(iterPos / 3);
-  }
-  
-  return position;  // start tower was empty
-}
-
-function isValid(position, move) {
-  let iterPos = position;
-  // iterate from smallest disc to largest
-  for (let i = 0; i < discCountQ; i++) {
-    discLoc = iterPos % 3 + 1;
-    
-    // if we visited the from tower first, then its disc is smaller
-    if (discLoc === tableMoves[move][0]) return true;
-    // if we visited the to tower first, then its disc was smaller
-    if (discLoc === tableMoves[move][1]) return false;
-    
-    iterPos = Math.floor(iterPos / 3);
-  }
-  return false;  // should never get here
-}
-
 function getMove() {
   let num = toNum();
   if (num === positions - 1) return -1;
