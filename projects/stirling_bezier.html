@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+
+<html>
+  <head>
+    <title>Stirling Bezier</title>
+    <style>
+      body {
+        padding: 2em;
+      }
+      p {
+        height: 1em;
+      }
+    </style>
+    <script>
+      // for display
+      var cvs;
+      var ctx;
+      
+      const pointCount = 10;
+      var points;
+      
+      const resolution = 1000;
+      
+      function init() {
+        points = new Array(pointCount);
+        for (let i = 0; i < pointCount; i++) {
+          points[i] = [Math.random() * cvs.width, Math.random() * cvs.height];
+        }
+        
+        // draw lines
+        ctx.beginPath();
+        ctx.moveTo(points[0][0], points[0][1]);
+        for (let i = 1; i < pointCount; i++) {
+          ctx.lineTo(points[i][0], points[i][1]);
+        }
+        ctx.stroke();
+        
+        // draw circles
+        for (let i = 0; i < pointCount; i++) {
+          ctx.beginPath();
+          ctx.arc(points[i][0], points[i][1], 2, 0, 2 * Math.PI);
+          ctx.stroke();
+        }
+        
+        // draw curves
+        ctx.strokeStyle = "green";
+        draw(choose);
+        ctx.strokeStyle = "red";
+        draw(stirlingChoose);
+      }
+      
+      function draw(chooseFunc) {
+        ctx.beginPath();
+        ctx.moveTo(points[0][0], points[0][1]);
+      
+        for (let r = 1; r < resolution; r++) {
+          const t = r / resolution;
+          const omt = 1 - t;
+          
+          let point = [0, 0];
+          for (let i = 0; i < pointCount; i++) {
+            const c = chooseFunc(pointCount - 1, i);
+            const tp = Math.pow(t, i);
+            const omtp = Math.pow(omt, pointCount - 1 - i);
+            const coeff = c * tp * omtp;
+            point[0] += coeff * points[i][0];
+            point[1] += coeff * points[i][1];
+          }
+          //ctx.arc(point[0], point[1], 2, 0, 2 * Math.PI);
+          ctx.lineTo(point[0], point[1]);
+        }
+        
+        ctx.lineTo(points[pointCount - 1][0], points[pointCount - 1][1]);
+        ctx.stroke();
+      }
+      
+      function choose(n, k) {
+        if (2 * k > n) k = n - k;  // nCk = nC(n-k) so make k the smaller choice
+
+        let numerator = 1
+        let denominator = 1
+        for (let i = 0; i < k; i++) {
+          numerator *= n - i;
+          denominator *= i + 1;
+        }
+
+        return numerator / denominator;  // only one division
+      }
+      
+      function stirlingChoose(n, k) {
+        //if (k < 5) return choose(n, k);
+        return Math.exp(stirlingLnFact(n) - stirlingLnFact(k) - stirlingLnFact(n - k));
+      }
+      
+      function stirlingLnFact(n) {
+        if (n < 2) return 0;
+        return n * Math.log(n) - n + 0.5 * Math.log(2 * Math.PI * n);
+      }
+
+      window.onload = function() {
+        cvs = document.getElementById("cvs");
+        ctx = cvs.getContext("2d");
+
+        init();
+      }
+    </script>
+  </head>
+  <body>
+    <canvas id="cvs" width="1200" height="600"></canvas>
+  </body>
+</html>
