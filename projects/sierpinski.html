@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Sierpinski</title>
+    <style>
+      canvas {
+        border: 1px solid black;
+      }
+    </style>
+    <script>
+      function mid(pointA, pointB) {
+        return [(pointA[0] + pointB[0]) / 2, (pointA[1] + pointB[1]) / 2];
+      }
+      
+      // Offset to fit the triangles nicely into the canvas
+      function fitToCanvas(point) {
+        return [point[0] * 1000 + 40, 890 - point[1] * 1000];
+      }
+
+      // Canvas and context for drawing
+      var cvs;
+      var ctx;
+
+      // Draw triangles. This is expensive!
+      function draw(iters) {
+        ctx.clearRect(0, 0, cvs.width, cvs.height);
+        // Starting value: Large triangle has these points
+        let tri = [[0,0],[0.5, 0.866025403784],[1,0]];
+        drawTri(tri, iters);
+      }
+
+      function drawTri(tri, iters) {
+        ctx.beginPath();
+        ctx.moveTo(...fitToCanvas(tri[0]));
+        ctx.lineTo(...fitToCanvas(tri[1]));
+        ctx.lineTo(...fitToCanvas(tri[2]));
+        ctx.lineTo(...fitToCanvas(tri[0]));
+        ctx.stroke();
+
+        if (iters <= 1) return;
+
+        drawTri([tri[0], mid(tri[0], tri[1]), mid(tri[0], tri[2])], iters - 1);
+        drawTri([tri[1], mid(tri[1], tri[0]), mid(tri[1], tri[2])], iters - 1);
+        drawTri([tri[2], mid(tri[2], tri[0]), mid(tri[2], tri[1])], iters - 1);
+      }
+
+      // Init
+      window.onload = function() {
+        document.getElementById("slider").oninput = function() {
+          draw(this.value)
+        };
+
+        cvs = document.getElementById("cvs");
+        ctx = cvs.getContext("2d");
+
+        draw(8);
+      }
+    </script>
+  </head>
+  <body>
+    <input id="slider" type="range" min="1" max="10" value="8" step="1" autocomplete="off" /> <br>
+    <canvas id="cvs" height="900" width="1080"></canvas>
+  </body>
+</html>
