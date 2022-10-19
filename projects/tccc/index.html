@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>MIDI to TMB converter</title>
+    <title>TC Chart Converter</title>
     <link rel="stylesheet" href="index.css">
     <script src="midi-converter.js"></script>
     <script src="index.js"></script>
@@ -9,7 +9,7 @@
   <body>
     <!-- bruh I handwrote all of this -->
     <div class="container">
-      <h1>MIDI to TMB converter</h1>
+      <h1>Trombone Champ Chart Converter</h1>
 
       <div id="midicontainer">
         <h2><label for="midifile">MIDI file</label></h2>
@@ -61,11 +61,11 @@
         </tr>
         <tr>
           <td><label for="notestartcolor"><abbr title="Color of the start of the note">Note Start Color</abbr></label></td>
-          <td><input type="color" id="notestartcolor" name="notestartcolor" value="#ff0000"></td>
+          <td><input type="color" id="notestartcolor" name="notestartcolor" value="#ff3600"></td>
         </tr>
         <tr>
           <td><label for="noteendcolor"><abbr title="Color of the end of the note">Note End Color</abbr></label></td>
-          <td><input type="color" id="noteendcolor" name="noteendcolor" value="#ffff00"></td>
+          <td><input type="color" id="noteendcolor" name="noteendcolor" value="#ffcc4c"></td>
         </tr>
         <tr><td colspan="2"><h3>- Other -</h3></td></tr>
         <tr>
@@ -78,12 +78,12 @@
         </tr>
       </table>
 
-      <button id="generatetmb"><h2>Generate TMB</h2></button>
+      <button id="generatechart"><h2>Generate Chart</h2></button>
 
       <div id="warnings" class="info"></div>
 
       <div class="info">
-        <p>Converts a midi file (.mid) into a .tmb for TrombLoader.</p>
+        <p>Converts a midi file (.mid) into a TrombLoader chart.</p>
         <p>
           Most of the instructions for how to make a chart are on the Trombone Champ modding Discord:<br>
           <a href="https://discord.gg/KVzKRsbetJ">https://discord.gg/KVzKRsbetJ</a>
@@ -100,7 +100,7 @@
                 <li>Hover over the names of each field to see detailed info</li>
               </ul>
             </li>
-            <li>Click Generate TMB. The result will be downloaded as song.tmb</li>
+            <li>Click Generate Chart. The result will be downloaded as song.tmb</li>
           </ol>
         </p>
         <p>
@@ -116,9 +116,19 @@
         </p>
       </div>
 
+      <div>
+      <p>Version history</p>
       <p>
-        v1.0
+        v1.1:<br>
+        Renamed from "MIDI to TMB" to "TCCC"<br>
+        Fixed default colors<br>
+        Added version history
       </p>
+      <p>
+        v1.0:<br>
+        Initial release
+      </p>
+      </div>
     </div>
     <script>init()</script>
   </body>

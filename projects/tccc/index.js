@@ -48,7 +48,7 @@ function verifyInputs() {
     return true;
 }
 
-/** Entrypoint: read the midi, generate the tmb, and save it */
+/** Entrypoint: read the midi, generate the chart, and save it */
 async function generate() {
     warnings = {};
     warningsDiv.innerHTML = '';
@@ -66,7 +66,7 @@ async function generate() {
         ? Number(songEndpointInput.value)
         : calculatedEndpoint;
 
-    const tmb = {
+    const chart = {
         notes,
         name: songNameInput.value,
         shortName: shortNameInput.value,
@@ -86,7 +86,7 @@ async function generate() {
         UNK1: 0,
     }
     exportWarnings(warnings);
-    save('song.tmb', stringifyWithRounding(tmb));
+    save('song.tmb', stringifyWithRounding(chart));
 }
 
 /** Convert the midi to the notes array */
@@ -254,7 +254,7 @@ function exportWarnings(warnings) {
         warningsDiv.appendChild(elem);
     }
     if (Object.keys(warnings).length !== 0) {
-        alert('Created song.tmb with warnings. Check below the Generate button.');
+        alert('Created chart with warnings. Check below the Generate button.');
     }
 }
 
@@ -278,5 +278,5 @@ function init() {
 
     warningsDiv = document.getElementById('warnings');
 
-    document.getElementById('generatetmb').addEventListener('click', generate);
+    document.getElementById('generatechart').addEventListener('click', generate);
 }
