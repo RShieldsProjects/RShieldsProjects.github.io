@@ -1,0 +1,29 @@
+body {
+  font-family: sans-serif;
+  padding: 3em;
+}
+
+h1, h2, h3 {
+  text-align: center;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2em;
+}
+
+.info {
+  max-width: 50%;
+}
+
+#midicontainer {
+  padding: 0.5em 1em;
+  border: 1px solid black;
+}
+
+#warnings {
+  color: #c00;
+  font-weight: bold;
+}

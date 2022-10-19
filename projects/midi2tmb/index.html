@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>MIDI to TMB converter</title>
+    <link rel="stylesheet" href="index.css">
+    <script src="midi-converter.js"></script>
+    <script src="index.js"></script>
+  </head>
+  <body>
+    <!-- bruh I handwrote all of this -->
+    <div class="container">
+      <h1>MIDI to TMB converter</h1>
+
+      <div id="midicontainer">
+        <h2><label for="midifile">MIDI file</label></h2>
+        <input type="file" id="midifile" name="midifile" accept=".mid">
+      </div>
+
+      <table>
+        <tr><td colspan="2"><h3>- Song info -</h3></td></tr>
+        <tr>
+          <td><label for="songname"><abbr title="Full song name, as shown in the lefthand info during song select">Song Name</abbr></label></td>
+          <td><input type="text" id="songname" name="songname"></td>
+        </tr>
+        <tr>
+          <td><label for="shortname"><abbr title="Short song name, as shown in the righthand song selector">Short Name</abbr></label></td>
+          <td><input type="text" id="shortname" name="shortname"></td>
+        </tr>
+        <tr>
+          <td><label for="artist"><abbr title="Composer or author of the song">Artist</abbr></label></td>
+          <td><input type="text" id="artist" name="artist"></td>
+        </tr>
+        <tr>
+          <td><label for="releaseyear"><abbr title="Year the song was released">Release Year</abbr></label></td>
+          <td><input type="number" id="releaseyear" name="releaseyear" value="2022"></td>
+        </tr>
+        <tr>
+          <td><label for="genre"><abbr title="Genre of the song">Genre</abbr></label></td>
+          <td><input type="text" id="genre" name="genre"></td>
+        </tr>
+        <tr>
+          <td><label for="description"><abbr title="Song description, as shown in the lefthand song info">Description</abbr></label></td>
+          <td><input type="text" id="description" name="description"></td>
+        </tr>
+        <tr><td colspan="2"><h3>- Chart info -</h3></td></tr>
+        <tr>
+          <td><label for="bpm"><abbr title="Variable BPM and non-integer BPM are not supported">BPM</abbr></label></td>
+          <td><input type="number" id="bpm" name="bpm" min="1" max="1000"></td>
+        </tr>
+        <tr>
+          <td><label for="beatsperbar"><abbr title="How many measure lines to show in each bar. Usually 2 is fine for songs in 2/2 or 4/4 time and 3 is fine for songs in 3/4 or 6/8 time. For songs in other time signatures, this should usually be the number on the top of the time signature.">Beats Per Bar</abbr></label></td>
+          <td><input type="number" id="beatsperbar" name="beatsperbar" value="2" min="1" max="20"></td>
+        </tr>
+        <tr>
+          <td><label for="difficulty"><abbr title="Difficulty from 1 to 10 stars">Difficulty</abbr></label></td>
+          <td><input type="number" id="difficulty" name="difficulty" value="5" min="1" max="10"></td>
+        </tr>
+        <tr>
+          <td><label for="notespacing"><abbr title="The higher this is, the faster the chart will scroll and the fewer notes will be on the screen at once. If unsure, set this to the BPM and adjust from there.">Note Spacing</abbr></label></td>
+          <td><input type="number" id="notespacing" name="notespacing" min="1" max="1000"></td>
+        </tr>
+        <tr>
+          <td><label for="notestartcolor"><abbr title="Color of the start of the note">Note Start Color</abbr></label></td>
+          <td><input type="color" id="notestartcolor" name="notestartcolor" value="#ff0000"></td>
+        </tr>
+        <tr>
+          <td><label for="noteendcolor"><abbr title="Color of the end of the note">Note End Color</abbr></label></td>
+          <td><input type="color" id="noteendcolor" name="noteendcolor" value="#ffff00"></td>
+        </tr>
+        <tr><td colspan="2"><h3>- Other -</h3></td></tr>
+        <tr>
+          <td><label for="foldername"><abbr title="Name of the song folder, required for old versions of TrombLoader">Folder Name</abbr></label></td>
+          <td><input type="text" id="foldername" name="foldername"></td>
+        </tr>
+        <tr>
+          <td><label for="songendpoint"><abbr title="The length of the song in measures. Leave this blank unless you need to manually set the endpoint.">Song Endpoint</abbr></label></td>
+          <td><input type="number" id="songendpoint" name="songendpoint"></td>
+        </tr>
+      </table>
+
+      <button id="generatetmb"><h2>Generate TMB</h2></button>
+
+      <div id="warnings" class="info"></div>
+
+      <div class="info">
+        <p>Converts a midi file (.mid) into a .tmb for TrombLoader.</p>
+        <p>
+          Most of the instructions for how to make a chart are on the Trombone Champ modding Discord:<br>
+          <a href="https://discord.gg/KVzKRsbetJ">https://discord.gg/KVzKRsbetJ</a>
+        </p>
+        <p>
+          Usage:
+          <ol>
+            <li>Upload the midi above.</li>
+            <li>
+              Fill out the form
+              <ul>
+                <li>All fields must be filled in, except those in the Other section</li>
+                <li>Only input whole numbers. Decimals are not guaranteed to work.</li>
+                <li>Hover over the names of each field to see detailed info</li>
+              </ul>
+            </li>
+            <li>Click Generate TMB. The result will be downloaded as song.tmb</li>
+          </ol>
+        </p>
+        <p>
+          Notes:
+          <ul>
+            <li>Midi notes should be in the range 47 to 73 to match the game. Any notes outside this range will likely be unplayable.</li>
+            <li>Quantize your charts, the game hates unquantized notes</li>
+          </ul>
+        </p>
+        <p>
+          Nyx's converter, which I have shamelessly stolen most of the logic from, can be found at<br>
+          <a href="https://github.com/NyxTheShield/Midi2TromboneChamp">https://github.com/NyxTheShield/Midi2TromboneChamp</a>
+        </p>
+      </div>
+
+      <p>
+        v1.0
+      </p>
+    </div>
+    <script>init()</script>
+  </body>
+</html>
