@@ -76,6 +76,14 @@
           <td><label for="songendpoint"><abbr title="The length of the song in measures. Leave this blank unless you need to manually set the endpoint.">Song Endpoint</abbr></label></td>
           <td><input type="number" id="songendpoint" name="songendpoint"></td>
         </tr>
+        <tr>
+          <td><label for="clamppitch"><abbr title="Whether to clamp notes between midi pitches 47 and 73, the maximum range of vanilla Trombone Champ. If unchecked, generated notes may be unplayable.">Clamp Pitch</abbr></label></td>
+          <td><input type="checkbox" id="clamppitch" name="clamppitch" checked></td>
+        </tr>
+        <tr>
+          <td><label for="snap"><abbr title="What quantization snap to use for warning about unquantized notes. This should be a power of 2. Alternatively, setting this to 0 will ignore all quantization warnings. Triplets (snap 12) are recognized automatically, regardless.">Snap</abbr></label></td>
+          <td><input type="number" id="snap" name="snap" min="0" max="64" value="32"></td>
+        </tr>
       </table>
 
       <button id="generatechart"><h2>Generate Chart</h2></button>
@@ -108,6 +116,8 @@
           <ul>
             <li>Midi notes should be in the range 47 to 73 to match the game. Any notes outside this range will likely be unplayable.</li>
             <li>Quantize your charts, the game hates unquantized notes</li>
+            <li>Some midi editors use velocity 0 to indicate a note should turn off. This supports that. Don't otherwise set velocity to 0.</li>
+            <li>Unlike Midi2TromboneChamp, this squashes all tracks and has no slide track.</li>
           </ul>
         </p>
         <p>
@@ -118,6 +128,13 @@
 
       <div>
       <p>Version history</p>
+      <p>
+        v1.2:<br>
+        Added option to clamp notes<br>
+        Added warnings for unsnapped notes<br>
+        Treat midi start-note with velocity 0 as end-note<br>
+        Clean up object URLs
+      </p>
       <p>
         v1.1:<br>
         Renamed from "MIDI to TMB" to "TCCC"<br>

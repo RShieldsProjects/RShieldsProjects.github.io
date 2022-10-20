@@ -14,6 +14,8 @@ var noteStartColorInput;
 var noteEndColorInput;
 var folderNameInput;
 var songEndpointInput;
+var clampPitchInput;
+var snapInput;
 
 /** Warnings element */
 var warningsDiv;
@@ -36,9 +38,7 @@ function verifyInputs() {
         noteSpacingInput,
         noteStartColorInput,
         noteEndColorInput,
-        // We're okay with these being empty
-        // folderNameInput,
-        // songEndpointInput,
+        snapInput,
     ];
 
     for (const field of requiredFields) {
@@ -94,6 +94,9 @@ function midiToNotes(midi) {
     /** Length of a note (in beats) that would otherwise have 0 length */
     const defaultNoteLength = 0.2;
 
+    const clampPitch = clampPitchInput.checked;
+    const snaps = [Number(snapInput.value), 12];
+
     const notes = [];
     let lastMeasure = 0;
 
@@ -118,13 +121,42 @@ function midiToNotes(midi) {
     let lastPitch;
 
     for (const event of allMidiEvents) {
-        if (event.type === 9) { // note on
+        if (
+            event.type === 8 ||
+            (event.type === 9 && event.data[1] === 0)
+        ) { // note off
             const pitch = event.data[0];
+
+            // We ignore note-off events for pitches other than the current one
+            // which prevents slide-start notes from ending slides
+            if (currentNote && pitch === currentNote.startPitch) {
+                warnIfUnsnapped(event.time, timeDivision, snaps);
+                
+                const { startTime, startPitch } = currentNote;
+
+                const length = event.time - startTime;
+
+                notes.push([
+                    startTime / timeDivision,
+                    length > 0 ? length / timeDivision : defaultNoteLength,
+                    (startPitch - 60) * 13.75,
+                    0,
+                    (startPitch - 60) * 13.75,
+                ]);
+                lastMeasure = Math.ceil(event.time / timeDivision);
+
+                currentNote = undefined;
+            }
+        } else if (event.type === 9) { // note on
+            warnIfUnsnapped(event.time, timeDivision, snaps);
+
+            let pitch = event.data[0];
             if (pitch < 47 || pitch > 73) {
                 addWarning(
-                    'Pitch out of range',
+                    clampPitch ? 'Pitch clamped' : 'Pitch out of range',
                     { pitch, measure: Math.floor(event.time / timeDivision) }
                 );
+                if (clampPitch) pitch = Math.min(Math.max(pitch, 47), 73);
             }
             lastPitch = pitch;
 
@@ -148,27 +180,6 @@ function midiToNotes(midi) {
                 startTime: event.time,
                 startPitch: pitch,
             }
-        } else if (event.type === 8) { // note off
-            const pitch = event.data[0];
-
-            // We ignore note-off events for pitches other than the current one
-            // which prevents slide-start notes from ending slides
-            if (currentNote && pitch === currentNote.startPitch) {
-                const { startTime, startPitch } = currentNote;
-
-                const length = event.time - startTime;
-
-                notes.push([
-                    startTime / timeDivision,
-                    length > 0 ? length / timeDivision : defaultNoteLength,
-                    (startPitch - 60) * 13.75,
-                    0,
-                    (startPitch - 60) * 13.75,
-                ]);
-                lastMeasure = Math.ceil(event.time / timeDivision);
-
-                currentNote = undefined;
-            }
         } else if (event.type === 255) { // meta
             if (event.metaType === 81 && event.time !== 0) { // tempo change
                 addWarning(
@@ -186,6 +197,18 @@ function midiToNotes(midi) {
         // so we add an extra 4 measures
         calculatedEndpoint: lastMeasure + 4
     };
+}
+
+/** Returns whether a note is snapped (quantized) */
+function warnIfUnsnapped(eventTime, timeDivision, snaps) {
+    for (const snap of snaps) {
+        if ((eventTime * snap) % timeDivision === 0) return;
+    }
+
+    addWarning(
+        'Unsnapped note',
+        { measure: Math.floor(eventTime / timeDivision), eventTime }
+    )
 }
 
 /** Converts "#xxxxxx" to [float, float, float] */
@@ -226,16 +249,19 @@ function stringifyWithRounding(data) {
  * https://stackoverflow.com/a/33542499
  */
 function save(filename, data) {
-    const blob = new Blob([data], {type: 'application/json'});
-    if (window.navigator.msSaveOrOpenBlob) {
-        window.navigator.msSaveBlob(blob, filename);
+    const blob = new Blob([data], { type: 'application/json' });
+    if (navigator.msSaveOrOpenBlob) {
+        navigator.msSaveBlob(blob, filename);
     } else {
-        const elem = window.document.createElement('a');
-        elem.href = window.URL.createObjectURL(blob);
+        const elem = document.createElement('a');
+        elem.href = URL.createObjectURL(blob);
         elem.download = filename;
         document.body.appendChild(elem);
         elem.click();
         document.body.removeChild(elem);
+        setTimeout(function() {
+            URL.revokeObjectURL(elem.href);
+        }, 1000);
     }
 }
 
@@ -248,7 +274,7 @@ function addWarning(type, data) {
 /** Prints the warnings list to the warningsDiv */
 function exportWarnings(warnings) {
     for (const [warning, data] of Object.entries(warnings)) {
-        const elem = window.document.createElement('p');
+        const elem = document.createElement('p');
         // TODO sanitize
         elem.innerHTML = `${warning}: ${JSON.stringify(data)}`;
         warningsDiv.appendChild(elem);
@@ -275,6 +301,8 @@ function init() {
     noteEndColorInput = document.getElementById('noteendcolor');
     folderNameInput = document.getElementById('foldername');
     songEndpointInput = document.getElementById('songendpoint');
+    clampPitchInput = document.getElementById('clamppitch');
+    snapInput = document.getElementById('snap');
 
     warningsDiv = document.getElementById('warnings');
 
