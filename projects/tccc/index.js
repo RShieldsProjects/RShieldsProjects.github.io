@@ -108,7 +108,7 @@ async function generate() {
         notes,
         name: songNameInput.value,
         shortName: shortNameInput.value,
-        trackRef: folderNameInput.value,
+        trackRef: folderNameInput.value || `${Math.random()}`,
         year: Number(releaseYearInput.value),
         author: artistInput.value,
         genre: genreInput.value,
