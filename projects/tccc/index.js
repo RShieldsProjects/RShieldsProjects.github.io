@@ -1,5 +1,6 @@
 /** Data entry fields */
 var midiFileInput;
+var importMetadataFileInput;
 var songNameInput;
 var shortNameInput;
 var artistInput;
@@ -48,13 +49,49 @@ function verifyInputs() {
     return true;
 }
 
+async function importFromPrevious() {
+    if (!importMetadataFileInput.value) {
+        alert('Please ensure a chart is uploaded');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsText(importMetadataFileInput.files[0]);
+    return new Promise(function(resolve) {
+        reader.addEventListener(
+            'load',
+            function(event) {
+                const json = JSON.parse(event.target.result);
+
+                songNameInput.value = json.name ?? '';
+                shortNameInput.value = json.shortName ?? '';
+                artistInput.value = json.author ?? '';
+                releaseYearInput.value = json.year ?? '';
+                genreInput.value = json.genre ?? '';
+                descriptionInput.value = json.description ?? '';
+                bpmInput.value = json.tempo ?? '';
+                beatsPerBarInput.value = json.timesig ?? '';
+                difficultyInput.value = json.difficulty ?? '';
+                noteSpacingInput.value = json.savednotespacing ?? '';
+                if (json.note_color_start) noteStartColorInput.value = floatsToHex(json.note_color_start);
+                if (json.note_color_end) noteEndColorInput.value = floatsToHex(json.note_color_end);
+                folderNameInput.value = json.trackRef ?? '';
+                songEndpointInput.value = json.endpoint ?? '';
+
+                resolve();
+            },
+            { once: true }
+        );
+    });
+}
+
 /** Entrypoint: read the midi, generate the chart, and save it */
 async function generate() {
     warnings = {};
     warningsDiv.innerHTML = '';
 
     if (!verifyInputs()) {
-        alert('Please fill out all fields\n(Song Endpoint and Folder Name can be empty)');
+        alert('Please ensure a midi is uploaded and all fields are filled\n(Folder Name and Song Endpoint can be empty)');
         return;
     }
 
@@ -65,6 +102,7 @@ async function generate() {
     const endpoint = songEndpointInput.value
         ? Number(songEndpointInput.value)
         : calculatedEndpoint;
+    songEndpointInput.placeholder = calculatedEndpoint;
 
     const chart = {
         notes,
@@ -113,7 +151,31 @@ function midiToNotes(midi) {
             allMidiEvents.push({ ...event, time: currTime });
         }
     }
-    allMidiEvents.sort(function(a, b) { return a.time - b.time });
+    allMidiEvents.sort(function(a, b) {
+        const deltaTime = a.time - b.time;
+        if (deltaTime) return deltaTime;
+        
+        // Same time:
+        let aPriority = 0;
+        let bPriority = 0;
+        const aType = eventType(a);
+        const bType = eventType(b);
+        if (
+            (aType === 'noteOn' || aType === 'noteOff') &&
+            (bType === 'noteOn' || bType === 'noteOff')
+        ) {
+            if (a.data[0] === b.data[0]) {
+                // - If same note, note off event has priority
+                aPriority = eventType(a) === 'noteOff' ? 1 : 0;
+                bPriority = eventType(b) === 'noteOff' ? 1 : 0;
+            } else {
+                // - If different note, note on event has priority
+                aPriority = eventType(a) === 'noteOn' ? 1 : 0;
+                bPriority = eventType(b) === 'noteOn' ? 1 : 0;
+            }
+        }
+        return bPriority - aPriority;
+    });
 
     /** Note that we're currently creating */
     let currentNote;
@@ -121,10 +183,7 @@ function midiToNotes(midi) {
     let lastPitch;
 
     for (const event of allMidiEvents) {
-        if (
-            event.type === 8 ||
-            (event.type === 9 && event.data[1] === 0)
-        ) { // note off
+        if (eventType(event) === 'noteOff') {
             const pitch = event.data[0];
 
             // We ignore note-off events for pitches other than the current one
@@ -143,11 +202,11 @@ function midiToNotes(midi) {
                     0,
                     (startPitch - 60) * 13.75,
                 ]);
-                lastMeasure = Math.ceil(event.time / timeDivision);
+                lastMeasure = Math.ceil((event.time - 1) / timeDivision);
 
                 currentNote = undefined;
             }
-        } else if (event.type === 9) { // note on
+        } else if (eventType(event) === 'noteOn') {
             warnIfUnsnapped(event.time, timeDivision, snaps);
 
             let pitch = event.data[0];
@@ -180,7 +239,7 @@ function midiToNotes(midi) {
                 startTime: event.time,
                 startPitch: pitch,
             }
-        } else if (event.type === 255) { // meta
+        } else if (eventType(event) === 'meta') {
             if (event.metaType === 81 && event.time !== 0) { // tempo change
                 addWarning(
                     'Tempo change (unsupported)',
@@ -197,6 +256,21 @@ function midiToNotes(midi) {
         // so we add an extra 4 measures
         calculatedEndpoint: lastMeasure + 4
     };
+}
+
+function eventType(event) {
+    if (
+        event.type === 8 ||
+        (event.type === 9 && event.data[1] === 0)
+    ) {
+        return 'noteOff';
+    } else if (event.type === 9) {
+        return 'noteOn';
+    } else if (event.type === 255){
+        return 'meta';
+    } else {
+        return 'unknown';
+    }
 }
 
 /** Returns whether a note is snapped (quantized) */
@@ -217,6 +291,11 @@ function hexToFloats(hexColor) {
     const gInt = parseInt(hexColor.substring(3,5), 16);
     const bInt = parseInt(hexColor.substring(5,7), 16);
     return [rInt / 255, gInt / 255, bInt / 255];
+}
+
+/** Converts [float, float, float] to "#xxxxxx" */
+function floatsToHex(floats) {
+    return `#${ floats.map(function(f) { return Math.round(f * 255).toString(16); }).join('') }`;
 }
 
 /** Read the file into a Uint8Array */
@@ -280,13 +359,14 @@ function exportWarnings(warnings) {
         warningsDiv.appendChild(elem);
     }
     if (Object.keys(warnings).length !== 0) {
-        alert('Created chart with warnings. Check below the Generate button.');
+        alert('Created chart with warnings. Check above the Generate button.');
     }
 }
 
 /** Initializes the inputs and hooks */
 function init() {
     midiFileInput = document.getElementById('midifile');
+    importMetadataFileInput = document.getElementById('importmetadatafile');
     songNameInput = document.getElementById('songname');
     shortNameInput = document.getElementById('shortname');
     artistInput = document.getElementById('artist');
@@ -306,5 +386,8 @@ function init() {
 
     warningsDiv = document.getElementById('warnings');
 
+    document.getElementById('importmetadatabutton').addEventListener('click', importFromPrevious);
     document.getElementById('generatechart').addEventListener('click', generate);
+
+    midiFileInput.addEventListener('change', function() { songEndpointInput.placeholder = 'Auto'; });
 }
