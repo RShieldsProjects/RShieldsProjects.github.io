@@ -3,20 +3,45 @@
   <head>
     <title>TC Chart Converter</title>
     <link rel="stylesheet" href="index.css">
-    <script src="midi-converter.js"></script>
-    <script src="index.js"></script>
+    <script src="lib/midi-converter.js"></script>
+    <!--
+      init must always come first, than warnings,
+      and the rest can be loaded in any order
+    -->
+    <script src="src/init.js"></script>
+    <script src="src/warnings.js"></script>
+
+    <script src="src/color.js"></script>
+    <script src="src/generate.js"></script>
+    <script src="src/import.js"></script>
+    <script src="src/inputs.js"></script>
+    <script src="src/midiToNotes.js"></script>
+    <script src="src/readMidi.js"></script>
+    <script src="src/save.js"></script>
+    <script src="src/settings.js"></script>
   </head>
   <body>
     <!-- bruh I handwrote all of this -->
-    <div class="container">
+    <div class="bodycontainer">
       <h1>Trombone Champ Chart Converter</h1>
 
-      <div id="midicontainer">
+      <div id="midicontainer" class="container">
         <h2><label for="midifile">MIDI file</label></h2>
         <input type="file" id="midifile" name="midifile" accept=".mid">
+        <table>
+          <tr>
+            <td><label for="clamppitch"><abbr title="Whether to clamp notes between midi pitches 47 and 73, the maximum range of vanilla Trombone Champ. If unchecked, generated notes may be unplayable.">Clamp Pitch</abbr></label></td>
+            <td><input type="checkbox" id="clamppitch" name="clamppitch" checked></td>
+          </tr>
+          <tr>
+            <td><label for="snap"><abbr title="What quantization snap to use for warning about unquantized notes. This should be a power of 2. Alternatively, setting this to 0 will ignore all quantization warnings. Triplets (snap 12) are recognized automatically, regardless.">Snap</abbr></label></td>
+            <td><input type="number" id="snap" name="snap" min="0" max="192" value="32"></td>
+          </tr>
+        </table>
+        <div id="midiwarnings" class="warnings"></div>
       </div>
 
-      <div>
+      <div id="metadatacontainer" class="container">
         <h2>Metadata</h2>
         <h3><label for="importmetadatafile">Import from previous (optional)</label></h3>
         <input type="file" id="importmetadatafile" name="importmetadatafile" accept=".tmb">
@@ -81,18 +106,10 @@
             <td><label for="songendpoint"><abbr title="The length of the song in measures. Leave this blank unless you need to manually set the endpoint.">Song Endpoint</abbr></label></td>
             <td><input type="number" id="songendpoint" name="songendpoint" placeholder="Auto"></td>
           </tr>
-          <tr>
-            <td><label for="clamppitch"><abbr title="Whether to clamp notes between midi pitches 47 and 73, the maximum range of vanilla Trombone Champ. If unchecked, generated notes may be unplayable.">Clamp Pitch</abbr></label></td>
-            <td><input type="checkbox" id="clamppitch" name="clamppitch" checked></td>
-          </tr>
-          <tr>
-            <td><label for="snap"><abbr title="What quantization snap to use for warning about unquantized notes. This should be a power of 2. Alternatively, setting this to 0 will ignore all quantization warnings. Triplets (snap 12) are recognized automatically, regardless.">Snap</abbr></label></td>
-            <td><input type="number" id="snap" name="snap" min="0" max="192" value="32"></td>
-          </tr>
         </table>
       </div>
 
-      <div id="warnings" class="info"></div>
+      <div id="generatewarnings" class="warnings"></div>
 
       <button id="generatechart"><h2>Generate Chart</h2></button>
 
@@ -135,6 +152,13 @@
       <div>
       <p>Version history</p>
       <p>
+        v1.4:<br>
+        Load the midi eagerly instead of only at generate time<br>
+        Format warnings better and let users hide them<br>
+        Change styling a bit<br>
+        Split the code into many files
+      </p>
+      <p>
         v1.3a:<br>
         Added randomly generated folder names to fix a name collision issue
       </p>
@@ -165,6 +189,6 @@
       </p>
       </div>
     </div>
-    <script>init()</script>
+    <script>init();</script>
   </body>
 </html>
