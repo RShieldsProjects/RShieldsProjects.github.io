@@ -1,5 +1,5 @@
 /** Data entry fields */
-var importMetadataFileInput;
+let importMetadataFileInput;
 
 async function importFromPrevious() {
     if (!importMetadataFileInput.value) {

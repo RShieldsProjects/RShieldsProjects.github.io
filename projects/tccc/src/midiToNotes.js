@@ -1,5 +1,5 @@
-var notes = [];
-var calculatedEndpoint = 1;
+let notes = [];
+let calculatedEndpoint = 1;
 
 /** Length of a note (in beats) that would otherwise have 0 length */
 const defaultNoteLength = 0.2;
@@ -13,7 +13,6 @@ function midiToNotes(midi) {
 
     const clampPitch = getSetting('clamppitch');
     const snaps = [getSetting('snap'), 12];
-    console.log(snaps);
 
     let lastMeasure = 0;
 
@@ -136,6 +135,7 @@ function midiToNotes(midi) {
     calculatedEndpoint = lastMeasure + 4;
     inputs['songendpoint'].placeholder = calculatedEndpoint;
     midiWarnings.display();
+    displayPreview();
 }
 
 function eventType(event) {

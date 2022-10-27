@@ -16,6 +16,7 @@
     <script src="src/import.js"></script>
     <script src="src/inputs.js"></script>
     <script src="src/midiToNotes.js"></script>
+    <script src="src/preview.js"></script>
     <script src="src/readMidi.js"></script>
     <script src="src/save.js"></script>
     <script src="src/settings.js"></script>
@@ -109,8 +110,14 @@
         </table>
       </div>
 
-      <div id="generatewarnings" class="warnings"></div>
+      <div>
+        <h2>Preview</h2>
+        <div id="previewcontainer">
+          <canvas id="preview" height="200"></canvas>
+        </div>
+      </div>
 
+      <div id="generatewarnings" class="warnings"></div>
       <button id="generatechart"><h2>Generate Chart</h2></button>
 
       <div class="info">
@@ -151,6 +158,11 @@
 
       <div>
       <p>Version history</p>
+      <p>
+        v1.5:<br>
+        Add preview<br>
+        Switch from vars to only lets and consts
+      </p>
       <p>
         v1.4:<br>
         Load the midi eagerly instead of only at generate time<br>

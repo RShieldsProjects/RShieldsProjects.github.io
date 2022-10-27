@@ -1,8 +1,8 @@
 /** Maps input names to input elements */
-var inputs = {};
+const inputs = {};
 
 /** Maps input names to their prop names in the chart format */
-var inputMap = {
+const inputMap = {
     songname: 'name',
     shortname: 'shortName',
     artist: 'author',
@@ -19,10 +19,13 @@ var inputMap = {
     songendpoint: 'endpoint',
 };
 
-var optionalInputNames = new Set(['foldername', 'songendpoint']);
+/** Inputs that are not required to be filled in */
+const optionalInputNames = new Set(['foldername', 'songendpoint']);
 
-var numberInputNames = new Set(['releaseyear', 'difficulty', 'notespacing', 'songendpoint', 'beatsperbar', 'bpm']);
-var colorInputNames = new Set(['notestartcolor', 'noteendcolor']);
+/** Inputs that need to be formatted as numbers */
+const numberInputNames = new Set(['releaseyear', 'difficulty', 'notespacing', 'songendpoint', 'beatsperbar', 'bpm']);
+/** Inputs that need to be formatted as colors */
+const colorInputNames = new Set(['notestartcolor', 'noteendcolor']);
 
 /** Returns whether all required fields are filled in */
 function verifyInputs() {
@@ -34,6 +37,7 @@ function verifyInputs() {
     return true;
 }
 
+/** Reads inputs as chart-formatted object */
 function readInputs(warnings) {
     const result = {};
     for (const [inputName, input] of Object.entries(inputs)) {
@@ -48,6 +52,20 @@ function readInputs(warnings) {
     return result;
 }
 
+/** Reads inputs as { startColor, endColor }, both hex codes */
+function readColors() {
+    const result = {};
+    for (const inputName of colorInputNames) {
+        const input = inputs[inputName];
+        result[inputName] = input.value;
+    }
+    return {
+        startColor: result.notestartcolor,
+        endColor: result.noteendcolor
+    };
+}
+
+/** Writes inputs from chart-formatted object */
 function writeInputs(obj) {
     for (const [inputName, input] of Object.entries(inputs)) {
         const chartFormatName = inputMap[inputName];

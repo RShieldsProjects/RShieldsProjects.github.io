@@ -1,6 +1,6 @@
-var settings = {};
+const settings = {};
 
-var settingsArr = ['clamppitch', 'snap'];
+const settingsNames = ['clamppitch', 'snap'];
 
 function getSetting(name) {
     switch (name) {
@@ -11,7 +11,7 @@ function getSetting(name) {
 }
 
 registerInit(function() {
-    for (const settingName of settingsArr) {
+    for (const settingName of settingsNames) {
         const setting = document.getElementById(settingName);
         if (!setting) throw `Could not find setting: ${settingName}`
         settings[settingName] = setting;

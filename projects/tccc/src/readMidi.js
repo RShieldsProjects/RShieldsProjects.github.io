@@ -1,4 +1,4 @@
-var midiFileInput;
+let midiFileInput;
 
 /** Read the file into a Uint8Array */
 async function readFileToBytes() {

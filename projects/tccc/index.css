@@ -43,6 +43,15 @@ h1, h2, h3 {
   align-self: center;
 }
 
+#previewcontainer {
+  margin: 0 -25vw;
+  overflow-x: scroll;
+}
+
+#preview {
+  padding: 0 25vw;
+}
+
 ol, ul {
   margin: 0;
 }

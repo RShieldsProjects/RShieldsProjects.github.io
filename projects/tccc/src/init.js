@@ -1,4 +1,4 @@
-var inits = [];
+const inits = [];
 
 /** Registers a function which will be called when the page finishes loading */
 function registerInit(fn) {
