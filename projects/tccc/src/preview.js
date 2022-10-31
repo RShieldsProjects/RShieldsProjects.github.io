@@ -1,4 +1,4 @@
-const targetPixelsPerMeasure = 50;
+const targetPixelsPerBeat = 50;
 const maxNoteHeight = 180;
 
 let previewCanvas;
@@ -7,7 +7,7 @@ let previewCanvas;
 function displayPreview() {
     const ctx = previewCanvas.getContext('2d');
     ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-    const width = Math.min(calculatedEndpoint * targetPixelsPerMeasure, 32767);
+    const width = Math.min(calculatedEndpoint * targetPixelsPerBeat, 32767);
     previewCanvas.width = width;
 
     drawBars(ctx);
@@ -73,12 +73,12 @@ function drawNote(note, width, startColor, endColor, ctx) {
     ctx.stroke();
 }
 
-/** Convert a coordinate of the form [measure, tc height] to [canvas x, canvas y] */
+/** Convert a coordinate of the form [beat, tc height] to [canvas x, canvas y] */
 function transformPosition(coord) {
-    const pixelsPerMeasure = Math.min(targetPixelsPerMeasure, previewCanvas.width / calculatedEndpoint);
+    const pixelsPerBeat = Math.min(targetPixelsPerBeat, previewCanvas.width / calculatedEndpoint);
     const [x, y] = coord;
     return [
-        x * pixelsPerMeasure,
+        x * pixelsPerBeat,
         (-y + maxNoteHeight) / (maxNoteHeight * 2) * previewCanvas.height
     ];
 }

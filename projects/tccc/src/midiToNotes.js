@@ -14,7 +14,7 @@ function midiToNotes(midi) {
     const clampPitch = getSetting('clamppitch');
     const snaps = [getSetting('snap'), 12];
 
-    let lastMeasure = 0;
+    let lastBeat = 0;
 
     /* Begin translated section */
     const { timeDivision } = midi;
@@ -84,7 +84,7 @@ function midiToNotes(midi) {
                     0,
                     (startPitch - 60) * 13.75,
                 ]);
-                lastMeasure = Math.ceil((event.time - 1) / timeDivision);
+                lastBeat = Math.ceil((event.time - 1) / timeDivision);
 
                 currentNote = undefined;
             }
@@ -95,7 +95,7 @@ function midiToNotes(midi) {
             if (pitch < 47 || pitch > 73) {
                 midiWarnings.add(
                     clampPitch ? 'Pitch clamped' : 'Pitch out of range',
-                    { pitch, measure: Math.floor(event.time / timeDivision) }
+                    { pitch, beat: Math.floor(event.time / timeDivision) }
                 );
                 if (clampPitch) pitch = Math.min(Math.max(pitch, 47), 73);
             }
@@ -125,14 +125,14 @@ function midiToNotes(midi) {
             if (event.metaType === 81 && event.time !== 0) { // tempo change
                 midiWarnings.add(
                     'Tempo change (unsupported)',
-                    { measure: Math.floor(event.time / timeDivision) }
+                    { beat: Math.floor(event.time / timeDivision) }
                 );
             }
         }
     }
     /* End translated section */
 
-    calculatedEndpoint = lastMeasure + 4;
+    calculatedEndpoint = lastBeat + 4;
     inputs['songendpoint'].placeholder = calculatedEndpoint;
     midiWarnings.display();
     displayPreview();
@@ -161,6 +161,6 @@ function warnIfUnsnapped(eventTime, timeDivision, snaps) {
 
     midiWarnings.add(
         'Unsnapped note',
-        { measure: Math.floor(eventTime / timeDivision), eventTime }
+        { beat: Math.floor(eventTime / timeDivision), eventTime }
     )
 }
