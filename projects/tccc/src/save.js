@@ -3,11 +3,14 @@ function save(chart) {
     _save('song.tmb', stringifyWithRounding(chart));
 }
 
-/** Stringify some json but round all the floats to at most 3 decimals */
+/**
+ * Stringify some json but round all the floats to at most
+ * 8 significant digits, the most a float can have.
+ */
 function stringifyWithRounding(data) {
     return JSON.stringify(data, function(key, value) {
         if (typeof value === 'number') {
-            return Math.round(value * 1000) / 1000;
+            return Number(value.toPrecision(8));
         }
         return value;
     });
