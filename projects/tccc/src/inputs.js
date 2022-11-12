@@ -78,6 +78,7 @@ function writeInputs(obj) {
         } else {
             input.value = value;
         }
+        input.dispatchEvent(new Event('change'));
     }
 }
 

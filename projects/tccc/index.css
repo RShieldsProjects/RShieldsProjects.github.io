@@ -43,6 +43,24 @@ h1, h2, h3 {
   align-self: center;
 }
 
+.flexrow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+  grid-column-gap: 1em;
+  grid-row-gap: 0.5em;
+  align-items: center;
+}
+
+.grid h3 {
+  grid-column: span 3;
+}
+
 #previewcontainer {
   margin: 0 -25vw;
   overflow-x: scroll;
@@ -58,4 +76,20 @@ ol, ul {
 
 p {
   margin-bottom: 0;
+}
+
+abbr {
+  width: 12px;
+  height: 12px;
+
+  border: 1px solid gray;
+  border-radius: 999px;
+
+  font-weight: bold;
+  font-size: 10px;
+  line-height: 12px;
+  color: gray;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
 }

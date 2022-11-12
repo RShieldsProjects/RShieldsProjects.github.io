@@ -29,16 +29,15 @@
       <div id="midicontainer" class="container">
         <h2><label for="midifile">MIDI file</label></h2>
         <input type="file" id="midifile" name="midifile" accept=".mid">
-        <table>
-          <tr>
-            <td><label for="clamppitch"><abbr title="Whether to clamp notes between midi pitches 47 and 73, the maximum range of vanilla Trombone Champ. If unchecked, generated notes may be unplayable.">Clamp Pitch</abbr></label></td>
-            <td><input type="checkbox" id="clamppitch" name="clamppitch" checked></td>
-          </tr>
-          <tr>
-            <td><label for="snap"><abbr title="What quantization snap to use for warning about unquantized notes. This should be a power of 2. Alternatively, setting this to 0 will ignore all quantization warnings. Triplets (snap 12) are recognized automatically, regardless.">Snap</abbr></label></td>
-            <td><input type="number" id="snap" name="snap" min="0" max="192" value="32"></td>
-          </tr>
-        </table>
+        <div class="grid">
+          <abbr title="Whether to clamp notes between midi pitches 47 and 73, the maximum range of vanilla Trombone Champ. If unchecked, generated notes may be unplayable.">i</abbr>
+          <label for="clamppitch">Clamp Pitch</label>
+          <input type="checkbox" id="clamppitch" name="clamppitch" checked>
+
+          <abbr title="What quantization snap to use for warning about unquantized notes. This should be a power of 2. Alternatively, setting this to 0 will ignore all quantization warnings. Triplets (snap 12) are recognized automatically, regardless.">i</abbr>
+          <label for="snap">Snap</label>
+          <input type="number" id="snap" name="snap" min="0" max="192" value="32">
+        </div>
         <div id="midiwarnings" class="warnings"></div>
       </div>
 
@@ -47,67 +46,75 @@
         <h3><label for="importmetadatafile">Import from previous (optional)</label></h3>
         <input type="file" id="importmetadatafile" name="importmetadatafile" accept=".tmb">
         <button id="importmetadatabutton">Import</button>
-        <table>
-          <tr><td colspan="2"><h3>- Song info -</h3></td></tr>
-          <tr>
-            <td><label for="songname"><abbr title="Full song name, as shown in the lefthand info during song select">Song Name</abbr></label></td>
-            <td><input type="text" id="songname" name="songname"></td>
-          </tr>
-          <tr>
-            <td><label for="shortname"><abbr title="Short song name, as shown in the righthand song selector">Short Name</abbr></label></td>
-            <td><input type="text" id="shortname" name="shortname"></td>
-          </tr>
-          <tr>
-            <td><label for="artist"><abbr title="Composer or author of the song">Artist</abbr></label></td>
-            <td><input type="text" id="artist" name="artist"></td>
-          </tr>
-          <tr>
-            <td><label for="releaseyear"><abbr title="Year the song was released">Release Year</abbr></label></td>
-            <td><input type="number" id="releaseyear" name="releaseyear" value="2022"></td>
-          </tr>
-          <tr>
-            <td><label for="genre"><abbr title="Genre of the song">Genre</abbr></label></td>
-            <td><input type="text" id="genre" name="genre"></td>
-          </tr>
-          <tr>
-            <td><label for="description"><abbr title="Song description, as shown in the lefthand song info">Description</abbr></label></td>
-            <td><input type="text" id="description" name="description"></td>
-          </tr>
-          <tr><td colspan="2"><h3>- Chart info -</h3></td></tr>
-          <tr>
-            <td><label for="bpm"><abbr title="Variable BPM and non-integer BPM are not supported">BPM</abbr></label></td>
-            <td><input type="number" id="bpm" name="bpm" min="1" max="1000"></td>
-          </tr>
-          <tr>
-            <td><label for="beatsperbar"><abbr title="How many measure lines to show in each bar. Usually 2 is fine for songs in 2/2 or 4/4 time and 3 is fine for songs in 3/4 or 6/8 time. For songs in other time signatures, this should usually be the number on the top of the time signature.">Beats Per Bar</abbr></label></td>
-            <td><input type="number" id="beatsperbar" name="beatsperbar" value="2" min="1" max="20"></td>
-          </tr>
-          <tr>
-            <td><label for="difficulty"><abbr title="Difficulty from 1 to 10 stars">Difficulty</abbr></label></td>
-            <td><input type="number" id="difficulty" name="difficulty" value="5" min="1" max="10"></td>
-          </tr>
-          <tr>
-            <td><label for="notespacing"><abbr title="The higher this is, the faster the chart will scroll and the fewer notes will be on the screen at once. If unsure, set this to 180 and adjust from there.">Note Spacing</abbr></label></td>
-            <td><input type="number" id="notespacing" name="notespacing" min="1" max="1000" value="180"></td>
-          </tr>
-          <tr>
-            <td><label for="notestartcolor"><abbr title="Color of the start of the note">Note Start Color</abbr></label></td>
-            <td><input type="color" id="notestartcolor" name="notestartcolor" value="#ff3600"></td>
-          </tr>
-          <tr>
-            <td><label for="noteendcolor"><abbr title="Color of the end of the note">Note End Color</abbr></label></td>
-            <td><input type="color" id="noteendcolor" name="noteendcolor" value="#ffcc4c"></td>
-          </tr>
-          <tr><td colspan="2"><h3>- Other -</h3></td></tr>
-          <tr>
-            <td><label for="foldername"><abbr title="Name of the song folder, required for old versions of TrombLoader">Folder Name</abbr></label></td>
-            <td><input type="text" id="foldername" name="foldername" placeholder="Auto"></td>
-          </tr>
-          <tr>
-            <td><label for="songendpoint"><abbr title="The length of the song in measures. Leave this blank unless you need to manually set the endpoint.">Song Endpoint</abbr></label></td>
-            <td><input type="number" id="songendpoint" name="songendpoint" placeholder="Auto"></td>
-          </tr>
-        </table>
+        <div class="grid">
+          <h3>- Song info -</h3>
+
+          <abbr title="Full song name, as shown in the lefthand info during song select">i</abbr>
+          <label for="songname">Song Name</label>
+          <input type="text" id="songname" name="songname">
+
+          <abbr title="Short song name, as shown in the righthand song selector">i</abbr>
+          <label for="shortname">Short Name</label>
+          <input type="text" id="shortname" name="shortname">
+
+          <abbr title="Composer or author of the song">i</abbr>
+          <label for="artist">Artist</label>
+          <input type="text" id="artist" name="artist">
+
+          <abbr title="Year the song was released">i</abbr>
+          <label for="releaseyear">Release Year</label>
+          <input type="number" id="releaseyear" name="releaseyear" value="2022">
+
+          <abbr title="Genre of the song">i</abbr>
+          <label for="genre">Genre</label>
+          <input type="text" id="genre" name="genre">
+
+          <abbr title="Song description, as shown in the lefthand song info">i</abbr>
+          <label for="description">Description</label>
+          <input type="text" id="description" name="description">
+
+          <h3>- Chart info -</h3>
+
+          <abbr title="Variable BPM and non-integer BPM are not supported">i</abbr>
+          <label for="bpm">BPM</label>
+          <input type="number" id="bpm" name="bpm" min="1" max="1000">
+
+          <abbr title="How many measure lines to show in each bar. Usually 2 is fine for songs in 2/2 or 4/4 time and 3 is fine for songs in 3/4 or 6/8 time. For songs in other time signatures, this should usually be the number on the top of the time signature.">i</abbr>
+          <label for="beatsperbar">Beats Per Bar</label>
+          <input type="number" id="beatsperbar" name="beatsperbar" value="2" min="1" max="20">
+
+          <abbr title="Difficulty from 1 to 10 stars">i</abbr>
+          <label for="difficulty">Difficulty</label>
+          <input type="number" id="difficulty" name="difficulty" value="5" min="1" max="10">
+
+          <abbr title="The higher this is, the faster the chart will scroll and the fewer notes will be on the screen at once. If unsure, set this to 180 and adjust from there.">i</abbr>
+          <label for="notespacing">Note Spacing</label>
+          <input type="number" id="notespacing" name="notespacing" min="1" max="1000" value="180">
+
+          <abbr title="Color of the start of the note">i</abbr>
+          <label for="notestartcolor">Note Start Color</label>
+          <div class="flexrow">
+            <input type="text" id="notestartcolortext" name="notestartcolortext">
+            <input type="color" id="notestartcolor" name="notestartcolor" value="#ff3600">
+          </div>
+
+          <abbr title="Color of the end of the note">i</abbr>
+          <label for="noteendcolor">Note End Color</label>
+          <div class="flexrow">
+            <input type="text" id="noteendcolortext" name="noteendcolortext">
+            <input type="color" id="noteendcolor" name="noteendcolor" value="#ffcc4c">
+          </div>
+
+          <h3>- Other -</h3>
+
+          <abbr title="Name of the song folder, required for old versions of TrombLoader">i</abbr>
+          <label for="foldername">Folder Name</label>
+          <input type="text" id="foldername" name="foldername" placeholder="Auto">
+
+          <abbr title="The length of the song in measures. Leave this blank unless you need to manually set the endpoint.">i</abbr>
+          <label for="songendpoint">Song Endpoint</label>
+          <input type="number" id="songendpoint" name="songendpoint" placeholder="Auto">
+        </div>
       </div>
 
       <div>
@@ -145,7 +152,7 @@
           Notes:
           <ul>
             <li>Midi notes should be in the range 47 to 73 to match the game. Any notes outside this range will likely be unplayable.</li>
-            <li>Quantize your charts, the game hates unquantized notes</li>
+            <li>Quantize your charts, the game hates unquantized notes.</li>
             <li>Some midi editors use velocity 0 to indicate a note should turn off. This supports that. Don't otherwise set velocity to 0.</li>
             <li>Unlike Midi2TromboneChamp, this squashes all tracks and has no slide track.</li>
           </ul>
@@ -158,6 +165,13 @@
 
       <div>
       <p>Version history</p>
+      <p>
+        v1.6:<br>
+        Added hex color input<br>
+        Made the preview update when the color is changed<br>
+        Made info hovers more visible<br>
+        Restyled tables to now use grids
+      </p>
       <p>
         v1.5b:<br>
         Fixed an issue where triplets could fail to connect

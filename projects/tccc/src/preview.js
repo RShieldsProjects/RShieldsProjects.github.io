@@ -85,4 +85,8 @@ function transformPosition(coord) {
 
 registerInit(function() {
     previewCanvas = document.getElementById('preview');
+
+    // Make note color changes refresh the preview
+    document.getElementById('notestartcolor').addEventListener('change', displayPreview);
+    document.getElementById('noteendcolor').addEventListener('change', displayPreview);
 });
