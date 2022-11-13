@@ -26,10 +26,24 @@
 <div class="bodycontainer">
   <h1>Trombone Champ Chart Converter</h1>
 
-  <div id="midicontainer" class="container">
+  <div id="midicontainer" class="container alignitemscenter">
     <h2><label for="midifile">MIDI file</label></h2>
     <input type="file" id="midifile" name="midifile" accept=".mid">
     <div class="grid">
+      <abbr
+        title="What slide mode to use. Examples for slide modes are included below (between the About and Version History sections). The default value is midi2tc.">i</abbr>
+      <span>Slide mode</span>
+      <div class="flexrow spacebetween">
+        <span>
+          <input type="radio" id="slidemidi2tc" name="slidemode" checked>
+          <label for="slidemidi2tc">midi2tc</label>
+        </span>
+        <span>
+          <input type="radio" id="slidetccc" name="slidemode">
+          <label for="slidetccc">tccc</label>
+        </span>
+      </div>
+
       <abbr
         title="Whether to clamp notes between midi pitches 47 and 73, the maximum range of vanilla Trombone Champ. If unchecked, generated notes may be unplayable.">i</abbr>
       <label for="clamppitch">Clamp Pitch</label>
@@ -43,7 +57,7 @@
     <div id="midiwarnings" class="warnings"></div>
   </div>
 
-  <div id="metadatacontainer" class="container">
+  <div id="metadatacontainer" class="container alignitemscenter">
     <h2>Metadata</h2>
     <h3><label for="importmetadatafile">Import from previous (optional)</label></h3>
     <input type="file" id="importmetadatafile" name="importmetadatafile" accept=".tmb">
@@ -132,7 +146,8 @@
   <div id="generatewarnings" class="warnings"></div>
   <button id="generatechart">Generate Chart</button>
 
-  <div class="info">
+  <div class="container">
+    <h2>About</h2>
     <p>Converts a midi file (.mid) into a TrombLoader chart.</p>
 
     <p>
@@ -174,8 +189,46 @@
     </p>
   </div>
 
-  <div>
-    <p>Version history</p>
+  <div id="slidemodes" class="container">
+    <h2>Slide modes</h2>
+
+    <p>TCCC can interpret midi files in two ways to create slide notes. They are not interchangeable: Slides made for
+      tccc mode will likely not convert properly in other converters.</p>
+
+    <p>In the below examples, blue notes are midi notes. Note that a vertical gray line in the middle of a midi note
+      indicates that the note is released and pressed again. The green line is the Trombone Champ notes that will be
+      generated.</p>
+
+    <h3>midi2tc mode</h3>
+    <p>This is the format used by midi2tc.exe. When two notes overlap, the slide will start at the time and pitch of the
+      start of the first note and end at the time and pitch of the <em>start</em> of the second note.</p>
+    <p>Note starts with a slide:</p>
+    <img src="res/slide_midi2tc_start.png"/>
+    <p>Multiple slides:</p>
+    <img src="res/slide_midi2tc_mid.png"/>
+    <p>Note ends with a slide: This is not possible in midi2tc slide mode. In midi2tc.exe 0.3.0 and earlier, it can be
+      done by using channel 2.</p>
+
+    <h3>tccc mode</h3>
+    <p>This is TCCC's own format. When two notes overlap, the slide will start at the time and pitch of the start of the
+      first note and end at the time and pitch of the <em>end</em> of the second note.
+    </p>
+    <p>Note starts with a slide:</p>
+    <img src="res/slide_tccc_start.png"/>
+    <p>Multiple slides:</p>
+    <img src="res/slide_tccc_mid.png"/>
+    <p>Note ends with a slide:</p>
+    <img src="res/slide_tccc_end.png"/>
+  </div>
+
+  <div class="container">
+    <h2>Version history</h2>
+    <p>
+      v1.7:<br>
+      Added slide modes and slide mode info section<br>
+      Added support for lyrics<br>
+      Aligned info "icons" better
+    </p>
     <p>
       v1.6a:<br>
       Reorganized the code
@@ -207,36 +260,36 @@
       Changed styling a bit<br>
       Split the code into many files
     </p>
-        <p>
-            v1.3a:<br>
-            Added randomly generated folder names to fix a name collision issue
-        </p>
-        <p>
-            v1.3:<br>
-            Added metadata importing<br>
-            Fixed an issue when a note ends at the same time as another starts<br>
-            Moved warnings to be above the button to make them easier to see<br>
-            Added placeholder for endpoint input<br>
-            Changed default note spacing: previously BPM, now 180
-        </p>
-        <p>
-            v1.2:<br>
-            Added option to clamp notes<br>
-            Added warnings for unsnapped notes<br>
-            Treat midi start-note with velocity 0 as end-note<br>
-            Added cleanup of object URLs
-        </p>
-        <p>
-            v1.1:<br>
-            Renamed from "MIDI to TMB" to "TCCC"<br>
-            Fixed default colors<br>
-            Added version history
-        </p>
-        <p>
-            v1.0:<br>
-            Initial release
-        </p>
-    </div>
+    <p>
+      v1.3a:<br>
+      Added randomly generated folder names to fix a name collision issue
+    </p>
+    <p>
+      v1.3:<br>
+      Added metadata importing<br>
+      Fixed an issue when a note ends at the same time as another starts<br>
+      Moved warnings to be above the button to make them easier to see<br>
+      Added placeholder for endpoint input<br>
+      Changed default note spacing: previously BPM, now 180
+    </p>
+    <p>
+      v1.2:<br>
+      Added option to clamp notes<br>
+      Added warnings for unsnapped notes<br>
+      Treat midi start-note with velocity 0 as end-note<br>
+      Added cleanup of object URLs
+    </p>
+    <p>
+      v1.1:<br>
+      Renamed from "MIDI to TMB" to "TCCC"<br>
+      Fixed default colors<br>
+      Added version history
+    </p>
+    <p>
+      v1.0:<br>
+      Initial release
+    </p>
+  </div>
 </div>
 <script>Init.init()</script>
 </body>

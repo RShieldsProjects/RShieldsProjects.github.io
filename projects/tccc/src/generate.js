@@ -18,7 +18,7 @@ const Generate = (function () {
     const chart = {
       ...inputs,
       notes: MidiToNotes.notes,
-      lyrics: [],
+      lyrics: MidiToNotes.lyrics,
       trackRef: inputs.trackRef || `${Math.random()}`,
       endpoint: inputs.endpoint || MidiToNotes.calculatedEndpoint,
       UNK1: 0,

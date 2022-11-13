@@ -23,7 +23,6 @@ h1, h2, h3 {
   border: 1px solid black;
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 1em;
 }
 
@@ -46,6 +45,14 @@ h1, h2, h3 {
 .flexrow {
   display: flex;
   flex-direction: row;
+  align-items: center;
+}
+
+.spacebetween {
+  justify-content: space-between;
+}
+
+.alignitemscenter {
   align-items: center;
 }
 
@@ -76,6 +83,14 @@ h1, h2, h3 {
   padding: 1em;
 }
 
+#slidemodes {
+  gap: 0;
+}
+
+#slidemodes img {
+  align-self: center;
+}
+
 ol, ul {
   margin: 0;
 }
@@ -85,15 +100,15 @@ p {
 }
 
 abbr {
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
 
   border: 1px solid gray;
   border-radius: 999px;
 
   font-weight: bold;
   font-size: 10px;
-  line-height: 12px;
+  line-height: 11px;
   color: gray;
   text-align: center;
   text-decoration: none;

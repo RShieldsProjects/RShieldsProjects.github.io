@@ -1,12 +1,14 @@
 const Settings = (function () {
   const settings = {};
 
-  const settingsNames = ["clamppitch", "snap"];
+  const settingsNames = ["clamppitch", "snap", "slidemidi2tc", "slidetccc"];
 
   function getSetting(name) {
     switch (name) {
       case "clamppitch":
-        return settings["clamppitch"].checked;
+      case "slidemidi2tc":
+      case "slidetccc":
+        return settings[name].checked;
       case "snap":
         return Number(settings["snap"].value);
       default:
