@@ -23,15 +23,19 @@ const Inputs = (function () {
   /** Inputs that are not required to be filled in */
   const optionalInputNames = new Set(["foldername", "songendpoint"]);
 
-  /** Inputs that need to be formatted as numbers */
-  const numberInputNames = new Set([
+  /** Inputs that need to be formatted as ints */
+  const intInputNames = new Set([
     "releaseyear",
     "difficulty",
     "notespacing",
     "songendpoint",
     "beatsperbar",
+  ]);
+  /** Inputs that need to be formatted as floats */
+  const floatInputNames = new Set([
     "bpm",
   ]);
+
   /** Inputs that need to be formatted as colors */
   const colorInputNames = new Set(["notestartcolor", "noteendcolor"]);
 
@@ -49,12 +53,10 @@ const Inputs = (function () {
   function readInputs(warnings) {
     const result = {};
     for (const [inputName, input] of Object.entries(inputs)) {
-      if (numberInputNames.has(inputName)) {
-        result[inputMap[inputName]] = toNumber(
-          input.value,
-          warnings,
-          inputName
-        );
+      if (intInputNames.has(inputName)) {
+        result[inputMap[inputName]] = toInt(input.value, warnings, inputName);
+      } else if (floatInputNames.has(inputName)) {
+        result[inputMap[inputName]] = Number(input.value);
       } else if (colorInputNames.has(inputName)) {
         result[inputMap[inputName]] = Color.hexToFloats(input.value);
       } else {
@@ -95,7 +97,7 @@ const Inputs = (function () {
   }
 
   /** Converts a string to an number, warning if it's actually a float */
-  function toNumber(str, warnings, name) {
+  function toInt(str, warnings, name) {
     const num = Number(str);
     if (num % 1 !== 0) {
       warnings.add("Not a whole number", { field: name, value: num });
