@@ -14,7 +14,10 @@ const Color = (function () {
 
   /** Converts [float, float, float] to "#xxxxxx" */
   function floatsToHex(floats) {
-    return `#${floats.map((f) => Math.round(f * 255).toString(16)).join("")}`;
+    return '#' + floats.map((f) => {
+      const hex = Math.round(f * 255).toString(16);
+      return hex.length === 2 ? hex : '0' + hex;
+    }).join("");
   }
 
   Init.register(function () {
