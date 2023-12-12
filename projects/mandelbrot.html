@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mandelbrot</title>
+</head>
+<body>
+  <canvas id='cvs' width="800" height="800"></canvas><br>
+  x:<br>
+  <input id="x" type="range" min="-1" max="1" step="0.0001" value="0" style="width: 800px"><br>
+  y:<br>
+  <input id="y" type="range" min="-1" max="1" step="0.0001" value="0" style="width: 800px"><br>
+  zoom:<br>
+  <input id="zoom" type="range" min="0" max="10" step="0.1" value="0" style="width: 800px">
+  <script id='vert' type='x-shader/x-vertex'>
+    attribute vec2 pos;
+    void main() {
+      gl_Position = vec4(pos, 0, 1);
+    }
+  </script>
+  <script id='frag' type='x-shader/x-fragment'>
+    precision highp float;
+    uniform vec2 viewport;
+    uniform vec3 params;
+    uniform sampler2D colors;
+
+    void main() {
+      vec2 uv = gl_FragCoord.xy / viewport;
+
+      vec2 c = ((uv * 2.0 - 1.0) / params.z - params.xy) * 1.5 + vec2(-0.5, 0);
+      vec2 z = vec2(0, 0);
+      int divergedAt = 0;
+      for (int i = 0; i < 100; i++) {
+        z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;
+        if (dot(z, z) > 100.0) {
+          divergedAt = i;
+          break;
+        }
+      }
+
+      // https://stackoverflow.com/a/25816111
+      float smoothed = log2(log2(dot(z, z)) * 0.5);
+      float colorIndex = sqrt(float(divergedAt) + 10.0 - smoothed) * 256.0 + 1000.0;
+      vec3 color = texture2D(colors, vec2(colorIndex / 2048.0, 0.5)).rgb;
+      gl_FragColor = vec4(min(float(divergedAt), 1.0) * color, 1);
+    }
+  </script>
+  <script>
+    const cvs = document.getElementById('cvs');
+    const gl = cvs.getContext('webgl');
+
+    const x = document.getElementById('x');
+    const y = document.getElementById('y');
+    const zoom = document.getElementById('zoom');
+
+    function buildShader(id, type) {
+      const src = document.getElementById(id).firstChild.nodeValue;
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, src);
+      gl.compileShader(shader);
+      console.log(id + ': ' + (gl.getShaderInfoLog(shader) || 'success'));  // Debugging
+      return shader;
+    }
+
+    const program = gl.createProgram();
+    const vert = buildShader('vert', gl.VERTEX_SHADER);
+    gl.attachShader(program, vert);
+    const frag = buildShader('frag', gl.FRAGMENT_SHADER);
+    gl.attachShader(program, frag);
+    gl.linkProgram(program);
+
+    const posArray = new Float32Array([
+      -1,  1,
+       1,  1,
+       1, -1,
+
+      -1,  1,
+       1, -1,
+      -1, -1,
+    ]);
+    const posBuffer = gl.createBuffer();
+
+    function smoothstep(value, lowVal, highVal, lowRes, highRes) {
+      if (value <= lowVal) return lowRes;
+      if (value >= highVal) return highRes;
+      const x = (value - lowVal) / (highVal - lowVal);
+      const s1 = 3 * x * x - 2 * x * x * x;
+      return [
+        (1 - s1) * lowRes[0] + s1 * highRes[0],
+        (1 - s1) * lowRes[1] + s1 * highRes[1],
+        (1 - s1) * lowRes[2] + s1 * highRes[2],
+      ];
+    }
+    // https://stackoverflow.com/a/25816111
+    const colorsControlPoints = [
+      [0,      [0, 7, 100]],
+      [0.16,   [32, 107, 203]],
+      [0.42,   [237, 255, 255]],
+      [0.6425, [255, 170, 0]],
+      [0.8575, [0, 2, 0]],
+      [1,      [0, 7, 100]],
+    ];
+    const colorsArray = [];
+    for (let i = 0; i < 2048; i++) {
+      const x = i / 2048;
+      const upperIndex = colorsControlPoints.findIndex(([pos]) => pos > x);
+      const lower = colorsControlPoints[upperIndex - 1];
+      const upper = colorsControlPoints[upperIndex];
+      const res = smoothstep(x, lower[0], upper[0], lower[1], upper[1]);
+      colorsArray.push(...res);
+    }
+    const colorsTexture = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, colorsTexture);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGB,
+      2048,
+      1,
+      0,
+      gl.RGB,
+      gl.UNSIGNED_BYTE,
+      new Uint8Array(colorsArray),
+    );
+    gl.generateMipmap(gl.TEXTURE_2D);
+
+    function draw() {
+      gl.viewport(0, 0, cvs.width, cvs.height);
+      gl.clearColor(0, 0, 0, 1);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.useProgram(program);
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, posArray, gl.STATIC_DRAW);
+      const posAttr = gl.getAttribLocation(program, 'pos');
+      gl.enableVertexAttribArray(posAttr);
+      gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
+
+      const colorsUnif = gl.getUniformLocation(program, 'colors');
+      gl.uniform1i(colorsUnif, 0);
+
+      const viewportUnif = gl.getUniformLocation(program, 'viewport');
+      gl.uniform2f(viewportUnif, cvs.width, cvs.height);
+
+      const paramsUnif = gl.getUniformLocation(program, 'params');
+      gl.uniform3f(paramsUnif, x.value, y.value, Math.exp(zoom.value));
+
+      gl.drawArrays(gl.TRIANGLES, 0, posArray.length / 2);
+    }
+
+    x.addEventListener('input', draw);
+    y.addEventListener('input', draw);
+    zoom.addEventListener('input', draw);
+
+    draw();
+  </script>
+</body>
+</html>
