@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Projectile Motion Simulation</title>
+    <style>
+      input {
+        width: 1200px;
+      }
+      div {
+        position: relative;
+      }
+      canvas {
+        position: absolute;
+        top: 0px;
+        left: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    Angle:<br>
+    <input id="angle" type="range" min="0.07" max="1.5" value="1" step="0.01" autocomplete="off" /> <br>
+    Speed:<br>
+    <input id="speed" type="range" min="1" max="12" value="10" step="0.01" autocomplete="off" /> <br>
+    <div>
+      <canvas id="cvs2" width=1200 height=800></canvas>
+      <canvas id="cvs1" width=1200 height=800></canvas>
+    </div>
+    <script>
+      const angle = document.getElementById('angle');
+      const speed = document.getElementById('speed');
+      // For dots, clear every frame
+      const cvs1 = document.getElementById('cvs1');
+      const ctx1 = cvs1.getContext('2d');
+      // For paths, clear on reset
+      const cvs2 = document.getElementById('cvs2');
+      const ctx2 = cvs2.getContext('2d');
+
+      let animationFrameHandle = null;
+
+      const startPosition = [0, 0];
+      let position;
+      let velocity;
+
+      function reset() {
+        window.cancelAnimationFrame(animationFrameHandle)
+
+        position = startPosition;
+        velocity = [speed.value * Math.cos(angle.value), speed.value * Math.sin(angle.value)];
+
+        ctx2.fillRect(0, 0, cvs2.width, cvs2.height);
+
+        animationFrameHandle = window.requestAnimationFrame(step);
+      }
+      angle.addEventListener('input', reset);
+      speed.addEventListener('input', reset);
+
+      function step() {
+        if (position[1] < 0) return;
+        
+        const oldPos = position;
+
+        velocity[1] -= 0.098;
+        position = [position[0] + velocity[0], position[1] + velocity[1]];
+
+        // Draw
+        ctx2.strokeStyle = 'red';
+        ctx2.beginPath();
+        ctx2.moveTo(oldPos[0], 800 - oldPos[1]);
+        ctx2.lineTo(position[0], 800 - position[1]);
+        ctx2.stroke();
+
+        ctx1.clearRect(0, 0, cvs1.width, cvs1.height);
+        ctx1.fillStyle = 'white';
+        ctx1.beginPath();
+        ctx1.arc(position[0], 800 - position[1], 5, 0, 2 * Math.PI, false);
+        ctx1.fill();
+        ctx1.stroke();
+
+        animationFrameHandle = window.requestAnimationFrame(step);
+      }
+
+      reset();
+    </script>
+  </body>
+</html>
