@@ -1,0 +1,118 @@
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #111;
+  color: white;
+  font-family: sans-serif;
+  font-size: 24px;
+}
+
+h1 {
+  text-align: center;
+}
+
+input {
+  padding: 0;
+  border: 2px solid #444;
+  border-radius: 5px;
+  background-color: transparent;
+  color: white;
+  font-family: sans-serif;
+  font-size: 24px;
+  text-align: center;
+}
+
+input[type=number] {
+  padding: 0 10px;
+  width: 1.5em;
+
+  -moz-appearance: textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+button {
+  padding: 5px 20px;
+  background-color: #444;
+  border: none;
+  border-radius: 20px;
+  color: white;
+  font-family: sans-serif;
+  font-size: 24px;
+}
+
+button[disabled] {
+  color: #444;
+  background-color: #222;
+}
+
+#container {
+  width: 100vh;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: stretch;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.numButtons {
+  margin-left: -8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.numButtons button {
+  padding: 0 5px 3px 5px;
+  border-radius: 5px;
+  font-family: monospace;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 12px;
+}
+
+#colorSelectors {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+#playfield {
+  background-color: #222;
+  padding: 50px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  gap: 50px;
+}
+
+.tube {
+  height: 150px;
+  width: 40px;
+  border: 4px solid #bbb;
+  border-top: none;
+  border-radius: 0 0 999px 999px;
+  overflow: hidden;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.water {
+  flex-grow: 1;
+  transition: background-color 0.1s;
+}

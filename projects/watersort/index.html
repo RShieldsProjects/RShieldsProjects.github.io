@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Water Sort Solver</title>
+  <link href="index.css" rel="stylesheet" type="text/css">
+  <script src="index.js"></script>
+</head>
+<body>
+  <div id="container">
+    <h1>Water Sort Solver</h1>
+    <div class="row">
+      Colors:
+      <input type="number" id="colorCount" name="tube count" min="2" max="12"></input>
+      <div id="colorNumButtons" class="numButtons">
+        <button>+</button>
+        <button>-</button>
+      </div>
+    </div>
+    <div id="colorSelectors"></div>
+    <div class="row">
+      Tubes:
+      <input type="number" id="tubeCount" name="tube count" min="3" max="15"></input>
+      <div id="tubeNumButtons" class="numButtons">
+        <button>+</button>
+        <button>-</button>
+      </div>
+    </div>
+    <div class="row">
+      <button id="clearTubes">Clear tubes</button>
+    </div>
+    <div id="playfield"></div>
+    <div class="row">
+      <button id="solve">Solve</button>
+    </div>
+    <input type="range" id="solutionRange" name="solve" min="0" max="1" value="0" disabled></input>
+    <div id="solutionButtons" class="row">
+      <button disabled>&lt;</button>
+      <button disabled>&#9654;</button>
+      <button disabled>&gt;</button>
+    </div>
+  </div>
+</body>
+</html>
