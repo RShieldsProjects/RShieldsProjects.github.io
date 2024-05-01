@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Paint By Letter</title>
+  <link href="index.css" rel="stylesheet" type="text/css">
+  <script src="rgbquant.js"></script>
+  <script src="index.js"></script>
+</head>
+<body>
+  <div id="sidebar">
+    <div>
+      Quality:
+      <input id="quality" type="range" min="0" max="5" value="3"></input>
+    </div>
+    <div id="load">
+      URL: <input id="loadurl"></input><button id="loadurlbutton">Load</button><br>
+      or<br>
+      File: <input id="loadfile" type="file" accept="image/*"></input><br>
+    </div>
+    Tools:
+    <div id="tools">
+      <button id="pencil">&#x270F;&#xFE0F;</button>
+      <button id="bucket">&#x1FAA3;</button>
+      <button id="wand">&#x1FA84;</button>
+    </div>
+    Palette:
+    <div id="colors"></div>
+    Progress:
+    <div id="progress"></div>
+    <div id="sidebarfooter">
+      <a href="https://github.com/leeoniya/RgbQuant.js/">Powered by RgbQuant.js</a>
+    </div>
+  </div>
+  <canvas id="canvas"></canvas>
+</body>
+</html>
