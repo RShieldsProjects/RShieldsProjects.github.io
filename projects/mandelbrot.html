@@ -5,7 +5,7 @@
 </head>
 <body>
   <canvas id='cvs' width="1600" height="900"></canvas><br>
-  Drag to move, scroll to zoom. At high zoom, the pixellation is caused by floating point error.
+  Drag to move, scroll to zoom. At high zoom, the artifacts are caused by floating point error.
   <script id='vert' type='x-shader/x-vertex'>
     attribute vec2 pos;
     void main() {
@@ -14,30 +14,103 @@
   </script>
   <script id='frag' type='x-shader/x-fragment'>
     precision highp float;
-    uniform vec2 viewport;
-    uniform vec3 params;
+
     uniform sampler2D colors;
+    uniform vec2 viewport;
+    uniform vec2 zoom;
+    uniform vec4 offset;
+    uniform float zero;  // Prevents undesired optimizations
 
-    void main() {
-      vec2 uv = gl_FragCoord.xy / viewport;
+    // https://andrewthall.org/papers/df64_qf128.pdf
+    vec2 p(float x, float y) {
+      return vec2(x, y);
+    }
 
-      vec2 c = (uv * 2.0 - 1.0) * vec2(viewport.x / viewport.y, 1.0) / params.z - params.xy;
-      vec2 z = vec2(0, 0);
-      vec2 z2 = vec2(0, 0);
-      float divergedAt = 0.0;
-      for (int i = 0; i < 1000; i++) {
-        z = vec2(z2.x - z2.y + c.x, (z.x + z.x) * z.y + c.y);
-        z2 = z * z;
-        if (z2.x + z2.y > 1000.0) {
-          divergedAt = float(i);
+    vec2 padd_(float a, float b) {
+      float s = a + b + zero;
+      float v = s - a;
+      float r = (a - (s - v)) + (b - v);
+      return vec2(s, r);
+    }
+
+    vec2 split_(float a) {
+      float c = 65537.0 * a;
+      float a_big = c - a;
+      float a_hi = c - a_big;
+      float a_lo = a - a_hi;
+      return vec2(a_hi, a_lo);
+    }
+
+    vec2 pmul_(float a, float b) {
+      float x = a * b;
+      vec2 av = split_(a);
+      vec2 bv = split_(b);
+      float err1 = x - (av.x * bv.x);
+      float err2 = err1 - (av.y * bv.x);
+      float err3 = err2 - (av.x * bv.y);
+      float y = (av.y * bv.y) - err3;
+      return vec2(x, y);
+    }
+
+    vec2 padd(vec2 a, vec2 b) {
+      float r = a.x + b.x + zero;
+      float s;
+      if (abs(a.x) >= abs(b.x)) {
+        s = (((a.x - r) + b.x) + b.y) + a.y;
+      } else {
+        s = (((b.x - r) + a.x) + a.y) + b.y;
+      }
+      return padd_(r, s);
+    }
+
+    vec2 pmul(vec2 a, vec2 b) {
+      vec2 t = pmul_(a.x, b.x);
+      float t3 = ((a.x * b.y) + (a.y * b.x)) + t.y;
+      return padd_(t.x, t3);
+    }
+
+    vec2 pdiv(vec2 b, vec2 a) {
+      float xn = 1.0 / a.x;
+      float yn = b.x * xn;
+      float diff = padd(b, -pmul(a, p(yn, 0.0))).x;
+      vec2 prod = pmul_(xn, diff);
+      return padd(p(yn, 0.0), prod);
+    }
+    
+    vec4 makeC(vec2 fragCoords) {
+      vec2 uv = fragCoords / viewport;
+      vec2 n = (uv * 2.0 - 1.0);
+      n.x *= viewport.x / viewport.y;
+
+      vec4 np = vec4(p(n.x, 0.0), p(n.y, 0.0));
+      vec4 ndz = vec4(pdiv(np.xy, zoom), pdiv(np.zw, zoom));
+      vec4 c = vec4(padd(ndz.xy, -offset.xy), padd(ndz.zw, -offset.zw));
+      return c;
+    }
+    
+    vec2 runMandelbrot(vec4 c) {
+      vec4 z = vec4(0, 0, 0, 0);
+      vec4 z2 = vec4(0, 0, 0, 0);
+      for (int i = 0; i < 500; i++) {
+        z = vec4(
+          padd(padd(z2.xy, -z2.zw), c.xy),
+          padd(pmul(padd(z.xy, z.xy), z.zw), c.zw)
+        );
+        z2 = vec4(pmul(z.xy, z.xy), pmul(z.zw, z.zw));
+        if (padd(z2.xy, z2.zw).x > 1000.0) {
+          return vec2(float(i), log2(log2(padd(z2.xy, z2.zw).x) * 0.5));
           break;
         }
       }
+      return vec2(-1, 0);
+    }
 
-      float smoothed = log2(log2(z2.x + z2.y) * 0.5);
-      float colorIndex = (divergedAt + 1.0 - smoothed) * 0.02;
+    void main() {
+      vec4 c = makeC(gl_FragCoord.xy);
+      vec2 res = runMandelbrot(c);
+      float colorIndex = (res.x + 1.0 - res.y) * 0.02;
       vec3 color = texture2D(colors, vec2(colorIndex, 0.5)).rgb;
-      gl_FragColor = vec4(min(divergedAt, 1.0) * color, 1);
+      gl_FragColor = vec4(min(res.x + 1.0, 1.0) * color, 1);
     }
   </script>
   <script>
@@ -47,6 +120,10 @@
     let x = 0.5;
     let y = 0;
     let zoom = -0.2;
+
+    function p(a) {
+      return [Math.fround(a), a - Math.fround(a)];
+    }
 
     function buildShader(id, type) {
       const src = document.getElementById(id).firstChild.nodeValue;
@@ -132,14 +209,20 @@
       gl.enableVertexAttribArray(posAttr);
       gl.vertexAttribPointer(posAttr, 2, gl.FLOAT, false, 0, 0);
 
+      const zeroUnif = gl.getUniformLocation(program, 'zero');
+      gl.uniform1f(zeroUnif, 0);
+
       const colorsUnif = gl.getUniformLocation(program, 'colors');
       gl.uniform1i(colorsUnif, 0);
 
       const viewportUnif = gl.getUniformLocation(program, 'viewport');
       gl.uniform2f(viewportUnif, cvs.width, cvs.height);
 
-      const paramsUnif = gl.getUniformLocation(program, 'params');
-      gl.uniform3f(paramsUnif, x, y, Math.exp(zoom));
+      const zoomUnif = gl.getUniformLocation(program, 'zoom');
+      gl.uniform2f(zoomUnif, ...p(Math.exp(zoom)));
+      
+      const offsetUnif = gl.getUniformLocation(program, 'offset');
+      gl.uniform4f(offsetUnif, ...p(x), ...p(y));
 
       gl.drawArrays(gl.TRIANGLES, 0, posArray.length / 2);
     }
