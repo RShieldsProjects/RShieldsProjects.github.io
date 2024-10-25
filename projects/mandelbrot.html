@@ -4,13 +4,8 @@
   <title>Mandelbrot</title>
 </head>
 <body>
-  <canvas id='cvs' width="800" height="800"></canvas><br>
-  x:<br>
-  <input id="x" type="range" min="-1" max="1" step="0.0001" value="0" style="width: 800px"><br>
-  y:<br>
-  <input id="y" type="range" min="-1" max="1" step="0.0001" value="0" style="width: 800px"><br>
-  zoom:<br>
-  <input id="zoom" type="range" min="0" max="10" step="0.1" value="0" style="width: 800px">
+  <canvas id='cvs' width="1600" height="900"></canvas><br>
+  Drag to move, scroll to zoom. At high zoom, the pixellation is caused by floating point error.
   <script id='vert' type='x-shader/x-vertex'>
     attribute vec2 pos;
     void main() {
@@ -26,31 +21,32 @@
     void main() {
       vec2 uv = gl_FragCoord.xy / viewport;
 
-      vec2 c = ((uv * 2.0 - 1.0) / params.z - params.xy) * 1.5 + vec2(-0.5, 0);
+      vec2 c = (uv * 2.0 - 1.0) * vec2(viewport.x / viewport.y, 1.0) / params.z - params.xy;
       vec2 z = vec2(0, 0);
-      int divergedAt = 0;
-      for (int i = 0; i < 100; i++) {
-        z = vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y) + c;
-        if (dot(z, z) > 100.0) {
-          divergedAt = i;
+      vec2 z2 = vec2(0, 0);
+      float divergedAt = 0.0;
+      for (int i = 0; i < 1000; i++) {
+        z = vec2(z2.x - z2.y + c.x, (z.x + z.x) * z.y + c.y);
+        z2 = z * z;
+        if (z2.x + z2.y > 1000.0) {
+          divergedAt = float(i);
           break;
         }
       }
 
-      // https://stackoverflow.com/a/25816111
-      float smoothed = log2(log2(dot(z, z)) * 0.5);
-      float colorIndex = sqrt(float(divergedAt) + 10.0 - smoothed) * 256.0 + 1000.0;
-      vec3 color = texture2D(colors, vec2(colorIndex / 2048.0, 0.5)).rgb;
-      gl_FragColor = vec4(min(float(divergedAt), 1.0) * color, 1);
+      float smoothed = log2(log2(z2.x + z2.y) * 0.5);
+      float colorIndex = (divergedAt + 1.0 - smoothed) * 0.02;
+      vec3 color = texture2D(colors, vec2(colorIndex, 0.5)).rgb;
+      gl_FragColor = vec4(min(divergedAt, 1.0) * color, 1);
     }
   </script>
   <script>
     const cvs = document.getElementById('cvs');
     const gl = cvs.getContext('webgl');
 
-    const x = document.getElementById('x');
-    const y = document.getElementById('y');
-    const zoom = document.getElementById('zoom');
+    let x = 0.5;
+    let y = 0;
+    let zoom = -0.2;
 
     function buildShader(id, type) {
       const src = document.getElementById(id).firstChild.nodeValue;
@@ -122,7 +118,7 @@
       gl.UNSIGNED_BYTE,
       new Uint8Array(colorsArray),
     );
-    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
     function draw() {
       gl.viewport(0, 0, cvs.width, cvs.height);
@@ -143,14 +139,34 @@
       gl.uniform2f(viewportUnif, cvs.width, cvs.height);
 
       const paramsUnif = gl.getUniformLocation(program, 'params');
-      gl.uniform3f(paramsUnif, x.value, y.value, Math.exp(zoom.value));
+      gl.uniform3f(paramsUnif, x, y, Math.exp(zoom));
 
       gl.drawArrays(gl.TRIANGLES, 0, posArray.length / 2);
     }
 
-    x.addEventListener('input', draw);
-    y.addEventListener('input', draw);
-    zoom.addEventListener('input', draw);
+    let mouseDown = false;
+    cvs.addEventListener('mousedown', function() { mouseDown = true });
+    window.addEventListener('mouseup', function() { mouseDown = false });
+    cvs.addEventListener('mousemove', function(e) {
+      if (!mouseDown) return;
+      const zoomMul = Math.exp(zoom);
+      x += e.movementX / 450 / zoomMul;
+      y -= e.movementY / 450 / zoomMul;
+      draw();
+    });
+    
+    cvs.addEventListener('wheel', function(e) {
+      const newZoom = zoom - e.deltaY / 200;
+      const largerScale = zoom > newZoom ? zoom : newZoom;
+      const largerScaleMulti = Math.exp(largerScale);
+
+      const m = (1 - Math.E) * (zoom - newZoom) / largerScaleMulti / 600;
+      x -= m * (e.offsetX - 800);
+      y += m * (e.offsetY - 450);
+
+      zoom = newZoom;
+      draw();
+    });
 
     draw();
   </script>
