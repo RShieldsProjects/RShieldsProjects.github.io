@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Nested Buttons</title>
+  <script>
+    const maxDepth = 100;
+    let inc;
+    let depth;
+    let startTime;
+
+    function reset() {
+      inc = 1;
+      depth = 0;
+
+      document.body.innerHTML = '';
+      add(document.body);
+    }
+
+    function click(e) {
+      e.stopPropagation();
+
+      if (inc === 1 && depth === 0) startTime = Date.now();
+
+      if (e.target.children.length > 0) return;
+
+      if (depth + inc >= maxDepth) {
+        inc++;
+        depth = 0;
+        document.body.innerHTML = '';
+        add(document.body);
+      } else {
+        let target = e.target
+        for (let i = 0; i < inc; i++) {
+          depth++;
+          target = add(target);
+        }
+      }
+
+      if (inc > maxDepth) {
+        const deltaMillis = Date.now() - startTime;
+        const mins = Math.floor(deltaMillis / 60000);
+        const secs = ((deltaMillis % 60000) / 1000).toLocaleString(undefined, { minimumIntegerDigits: 2, minimumFractionDigits: 3 });
+        document.body.innerHTML = `<p>Time: ${mins}:${secs}</p>`;
+
+        const resetButton = document.createElement('div');
+        resetButton.innerText = 'Reset';
+        resetButton.addEventListener('click', reset);
+        resetButton.style.background = 'white';
+        document.body.appendChild(resetButton);
+      }
+    }
+
+    function add(parent) {
+      parent.innerText = '';
+      const newDiv = document.createElement('div');
+      newDiv.innerHTML = 'Click';
+      newDiv.addEventListener('click', click);
+      newDiv.style.background = `hsl(${depth / maxDepth * 345}deg 80% 50%)`;
+      parent.appendChild(newDiv);
+      return newDiv;
+    }
+  </script>
+  <style>
+    body {
+      background: gray;
+      font-family: sans-serif;
+      font-size: 20px;
+    }
+
+    div {
+      padding: 5px;
+      border: 1px solid black;
+      display: inline-block;
+      user-select: none;
+    }
+  </style>
+</head>
+<body onload="reset()">
+</body>
+</html>
