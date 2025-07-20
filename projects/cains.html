@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cain's Jawbone checker</title>
+  <script>
+    window.addEventListener("load", (event) => {
+      const pagesTable = document.getElementById("pages");
+      for (let i = 1; i <= 100; i++) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+<td>${i}</td>
+<td><input id="page${i}" type="number" min="1" max="100" /></td>
+`;
+        pagesTable.appendChild(tr);
+      }
+      const murdersTable = document.getElementById("murders");
+      for (let i = 1; i <= 6; i++) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+<td>${i}.</td>
+<td><input id="murdered${i}" type="text" /></td>
+<td><input id="murderer${i}" type="text" /></td>
+`;
+        murdersTable.appendChild(tr);
+      }
+    });
+    
+    async function check() {
+      // Why am I salting this hash?
+      let str = "salt,";
+      for (let i = 1; i <= 100; i++) {
+        str += document.getElementById(`page${i}`).value + ","
+      }
+      for (let i = 1; i <= 6; i++) {
+        str += document.getElementById(`murdered${i}`).value.replaceAll(/\W/g, "").toLowerCase() + ","
+        str += document.getElementById(`murderer${i}`).value.replaceAll(/\W/g, "").toLowerCase() + ","
+      }
+      str += "salt";
+      
+      const hash = await sha256(str);
+      //alert(hash);
+      if (hash === "cb2e055fab5b56dd8d8ccef2d42365e962744ddb73b4931cd6f8a6e006ffbbe2") {
+        alert("Correct");
+      } else {
+        alert("Incorrect");
+      }
+    }
+    
+    async function sha256(message) {
+      const data = new TextEncoder().encode(message)
+      const buffer = await window.crypto.subtle.digest("SHA-256", data);
+      const hex = Array.from(new Uint8Array(buffer))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+      return hex;
+    }
+  </script>
+  <style>
+    table {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+    
+    td {
+      border-top: 1px solid black;
+      border-collapse: collapse;
+      text-align: center;
+    }
+    
+    th {
+      border-left: 1px solid black;
+    }
+    
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+      text-align: center;
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <table id="pages">
+    <tr>
+      <th>Printed<br>page</th>
+      <th>Should<br>be</th>
+    </tr>
+  </table>
+  <p>
+    Enter murders in the order by which they occur.<br>
+    Use the most common name in English and include both first and last name if available. Do not use honorifics or titles.<br>
+    Use only unaccented English letters. Capitalization does not matter.<br>
+    E.g. for Sir Alexander Chapman Ferguson, write "Alex Ferguson". For Pel&eacute; (Edson Arantes do Nascimento), write "Pele".
+  </p>
+  <table id="murders">
+    <tr>
+      <th>#</th>
+      <th>Murdered person</th>
+      <th>Murdered by</th>
+    </tr>
+  </table>
+  <br>
+  <button onclick="check()">Check</button>
+</body>
