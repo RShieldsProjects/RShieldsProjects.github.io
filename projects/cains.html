@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Cain's Jawbone checker</title>
+  <title>Cain's Jawbone Checker</title>
   <script>
     window.addEventListener("load", (event) => {
-      const pagesTable = document.getElementById("pages");
+      const pagesTables = [1,2,3,4,5].map(
+        (i) => document.getElementById(`pages${i}`)
+      );
       for (let i = 1; i <= 100; i++) {
         const tr = document.createElement("tr");
         tr.innerHTML = `
 <td>${i}</td>
 <td><input id="page${i}" type="number" min="1" max="100" /></td>
 `;
-        pagesTable.appendChild(tr);
+        pagesTables[Math.floor((i - 1) / 20)].appendChild(tr);
       }
       const murdersTable = document.getElementById("murders");
       for (let i = 1; i <= 6; i++) {
@@ -25,6 +27,19 @@
       }
     });
     
+    function fillPages() {
+      const arr = document.getElementById("quickpages").value.split(/\D/g);
+      
+      if (arr.length !== 100) {
+        alert(`Invalid length, expected 100 pages but found ${arr.length}`);
+        return;
+      }
+      
+      for (let i = 1; i <= 100; i++) {
+        document.getElementById(`page${i}`).value = arr[i - 1];
+      }
+    }
+    
     async function check() {
       // Why am I salting this hash?
       let pageStr = "salt,";
@@ -32,12 +47,15 @@
         pageStr += document.getElementById(`page${i}`).value + ","
       }
       pageStr += "salt";
-      const pagesCorrect = await sha256(pageStr) === "5e6b6ace440034912bcea1a539065138ba63a70a027deb6cc38d2d8dd7e69130";
+      const pageHash = await sha256(pageStr);
+      const pagesCorrect =
+        pageHash === "5e6b6ace440034912bcea1a539065138ba63a70a027deb6cc38d2d8dd7e69130"
+        || pageHash === "ba43453a59a1c7dc93c9ba3af402b48b8f28e306c85ae3291d11f797d44fbc3f";
       
       let murdersStr = "salt,";
       for (let i = 1; i <= 6; i++) {
-        murdersStr += document.getElementById(`murdered${i}`).value.replaceAll(/\W/g, "").toLowerCase() + ","
-        murdersStr += document.getElementById(`murderer${i}`).value.replaceAll(/\W/g, "").toLowerCase() + ","
+        murdersStr += document.getElementById(`murdered${i}`).value.replaceAll(/[^A-Za-z]/g, "").toLowerCase() + ","
+        murdersStr += document.getElementById(`murderer${i}`).value.replaceAll(/[^A-Za-z]/g, "").toLowerCase() + ","
       }
       murdersStr += "salt";
       const murdersCorrect = await sha256(murdersStr) === "ed13cf36e1a8e29daec8cf6871148a6f67f94ed06a7fd166e452757510e02b28";
@@ -78,6 +96,11 @@
       border-left: 1px solid black;
     }
     
+    #pages {
+      display: flex;
+      gap: 2em;
+    }
+    
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button {
       -webkit-appearance: none;
@@ -91,12 +114,48 @@
   </style>
 </head>
 <body>
-  <table id="pages">
-    <tr>
-      <th>Printed<br>page</th>
-      <th>Should<br>be</th>
-    </tr>
-  </table>
+  <h1>Cain's Jawbone Solution Checker</h1>
+
+  <h2>Pages</h2>
+  <p>
+    Quick page entry:<br>
+    Paste a sequence of pages of the form "2,3,1" or "2 3 1" etc.<br>
+    <input id="quickpages" type="text" autocomplete="off"/> <button onclick="fillPages()">Fill</button>
+  </p>
+  <div id="pages">
+    <table id="pages1">
+      <tr>
+        <th>Printed<br>page</th>
+        <th>Should<br>be</th>
+      </tr>
+    </table>
+    <table id="pages2">
+      <tr>
+        <th>Printed<br>page</th>
+        <th>Should<br>be</th>
+      </tr>
+    </table>
+    <table id="pages3">
+      <tr>
+        <th>Printed<br>page</th>
+        <th>Should<br>be</th>
+      </tr>
+    </table>
+    <table id="pages4">
+      <tr>
+        <th>Printed<br>page</th>
+        <th>Should<br>be</th>
+      </tr>
+    </table>
+    <table id="pages5">
+      <tr>
+        <th>Printed<br>page</th>
+        <th>Should<br>be</th>
+      </tr>
+    </table>
+  </div>
+  
+  <h2>Murders</h2>
   <p>
     Enter murders in the order by which they occur.<br>
     Use the most common name in English and include both first and last name if available. Do not use honorifics or titles.<br>
@@ -110,6 +169,7 @@
       <th>Murdered by</th>
     </tr>
   </table>
-  <br>
+  
+  <h2>Check</h2>
   <button onclick="check()">Check</button>
 </body>
