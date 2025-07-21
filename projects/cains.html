@@ -27,22 +27,29 @@
     
     async function check() {
       // Why am I salting this hash?
-      let str = "salt,";
+      let pageStr = "salt,";
       for (let i = 1; i <= 100; i++) {
-        str += document.getElementById(`page${i}`).value + ","
+        pageStr += document.getElementById(`page${i}`).value + ","
       }
-      for (let i = 1; i <= 6; i++) {
-        str += document.getElementById(`murdered${i}`).value.replaceAll(/\W/g, "").toLowerCase() + ","
-        str += document.getElementById(`murderer${i}`).value.replaceAll(/\W/g, "").toLowerCase() + ","
-      }
-      str += "salt";
+      pageStr += "salt";
+      const pagesCorrect = await sha256(pageStr) === "5e6b6ace440034912bcea1a539065138ba63a70a027deb6cc38d2d8dd7e69130";
       
-      const hash = await sha256(str);
-      //alert(hash);
-      if (hash === "cb2e055fab5b56dd8d8ccef2d42365e962744ddb73b4931cd6f8a6e006ffbbe2") {
+      let murdersStr = "salt,";
+      for (let i = 1; i <= 6; i++) {
+        murdersStr += document.getElementById(`murdered${i}`).value.replaceAll(/\W/g, "").toLowerCase() + ","
+        murdersStr += document.getElementById(`murderer${i}`).value.replaceAll(/\W/g, "").toLowerCase() + ","
+      }
+      murdersStr += "salt";
+      const murdersCorrect = await sha256(murdersStr) === "ed13cf36e1a8e29daec8cf6871148a6f67f94ed06a7fd166e452757510e02b28";
+      
+      if (pagesCorrect && murdersCorrect) {
         alert("Correct");
+      } else if (pagesCorrect) {
+        alert("Incorrect (murders)");
+      } else if (murdersCorrect) {
+        alert("Incorrect (pages)");
       } else {
-        alert("Incorrect");
+        alert("Incorrect (both)");
       }
     }
     
