@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="particles.js"></script>
+  <script>
+    const pi = 3.1415926;
+    
+    const U = 1;
+    const a = 1;
+    //const Gamma = 4 * pi * U * a;
+    const Gamma = 7;
+    
+    function sxToX(sx) { return (sx - 800) / 200; }
+    function syToY(sy) { return -(sy - 400) / 200; }
+    function dxToSdx(x) { return x; }
+    function dyToSdy(y) { return y; }
+    
+    function ux(sx, sy) {
+      const x = sxToX(sx);
+      const y = syToY(sy);
+      if (x**2 + y**2 < a**2) return 0;
+      
+      const dx = U * (1 - a**2 * (x**2 - y**2) / (x**2 + y**2)**2) +
+        Gamma / (2 * pi) * y / (x**2 + y**2);
+      
+      return dxToSdx(dx);
+    }
+    
+    function uy(sx, sy) {
+      const x = sxToX(sx);
+      const y = syToY(sy);
+      if (x**2 + y**2 < a**2) return 0;
+      
+      const dy = U * 2 * a**2 * x * y / (x**2 + y**2)**2 +
+        Gamma / (2 * pi) * x / (x**2 + y**2);
+      
+      return dyToSdy(dy);
+    }
+    
+    function doFrame(cvs, ctx) {
+      ctx.beginPath();
+      ctx.strokeStyle = 'black';
+      ctx.arc(800, 400, 200, 0, 2 * pi);
+      ctx.stroke();
+    }
+    
+    window.addEventListener('load', function () {
+      const cvs = document.getElementById('cvs');
+      const ctx = cvs.getContext('2d');
+      doFrame(cvs, ctx);
+    });
+  </script>
+</head>
+<body>
+  <canvas id="cvs" height="800" width="1600"></canvas>
+</body>
+</html>
