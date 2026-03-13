@@ -8,21 +8,22 @@
       }
       div {
         position: relative;
+        width: 1200px;
+        height: 800px;
       }
       canvas {
         position: absolute;
-        top: 0px;
-        left: 3px;
       }
     </style>
   </head>
   <body>
-    Note: Over time, the planet's orbit will change. This is caused by the physics simulation being imperfect, not by the math being wrong.
+    <label for="slider">Eccentricity:</label><br>
     <input id="slider" type="range" min="1" max="2" value="1.5" step="0.01" autocomplete="off" /> <br>
     <div>
-      <canvas id="cvs2" width=1200 height=800></canvas>
-      <canvas id="cvs1" width=1200 height=800></canvas>
+      <canvas id="cvs1" width="1200" height="800" style="z-index: 2"></canvas>
+      <canvas id="cvs2" width="1200" height="800" style="z-index: 1"></canvas>
     </div>
+    <p>Note: Over time, the planet's orbit may change. This is caused by the physics simulation being imperfect, not by the math being wrong.</p>
     <script>
       const slider = document.getElementById('slider');
       // For dots, clear every frame
@@ -66,7 +67,7 @@
 
         starPos = [-Math.sqrt(halfA * halfA - 1), 0];
         planetPos = [halfA, 0];
-        let r = planetPos[0] - starPos[0];
+        const r = planetPos[0] - starPos[0];
         planetVel = [0, Math.sqrt(GM * (2 / r - 1 / halfA))];
 
         ctx1.fillStyle = 'yellow';
@@ -76,31 +77,38 @@
       }
 
       function sqDist(pos1, pos2) {
-        let dx = pos1[0] - pos2[0];
-        let dy = pos1[1] - pos2[1];
+        const dx = pos1[0] - pos2[0];
+        const dy = pos1[1] - pos2[1];
         return dx * dx + dy * dy;
       }
 
       function dir(pos1, pos2) {
-        let unscaled = [pos2[0] - pos1[0], pos2[1] - pos1[1]];
-        let mag = Math.sqrt(sqDist(pos1, pos2));
+        const unscaled = [pos2[0] - pos1[0], pos2[1] - pos1[1]];
+        const mag = Math.sqrt(sqDist(pos1, pos2));
         return [unscaled[0] / mag, unscaled[1] / mag];
       }
 
       function updatePos() {
-        let oldPos = [planetPos[0], planetPos[1]];
+        const oldPos = [planetPos[0], planetPos[1]];
 
-        let steps = stepScale * sqDist([0,0], planetVel);
-        let dt = timeScale / steps;
+        const steps = stepScale * sqDist([0,0], planetVel);
+        const dt = timeScale / steps;
 
         for (let i = 0; i < steps; i++) {
+          // Verlet
           let accelMag = -GM / sqDist(starPos, planetPos);
           let accelDir = dir(starPos, planetPos);
-          let newVel = [planetVel[0] + accelDir[0] * accelMag * dt, planetVel[1] + accelDir[1] * accelMag * dt];
-          let newPos = [planetPos[0] + (planetVel[0] + newVel[0]) / 2 * dt, planetPos[1] + (planetVel[1] + newVel[1]) / 2 * dt];
+          let accel = [accelDir[0] * accelMag, accelDir[1] * accelMag];
 
-          planetPos = newPos;
-          planetVel = newVel;
+          planetVel = [planetVel[0] + accel[0] * dt / 2, planetVel[1] + accel[1] * dt / 2];
+
+          planetPos = [planetPos[0] + planetVel[0] * dt, planetPos[1] + planetVel[1] * dt];
+
+          accelMag = -GM / sqDist(starPos, planetPos);
+          accelDir = dir(starPos, planetPos);
+          accel = [accelDir[0] * accelMag, accelDir[1] * accelMag];
+
+          planetVel = [planetVel[0] + accel[0] * dt / 2, planetVel[1] + accel[1] * dt / 2];
         }
 
         ctx2.strokeStyle = 'red';
