@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title> Pendulum </title>
+</head>
+<body>
+  <canvas id="cvs" height="900" width="1800" style="border: 1px solid black"></canvas>
+  <script>
+    const cvs = document.getElementById('cvs');
+    const ctx = cvs.getContext('2d');
+    
+    const rodL = 0.4;   // m
+    const cartM = 0.4;  // kg
+    const bobM = 0.1;   // kg
+    const cg = rodL * bobM / (cartM + bobM) // distance from cart
+    const J = cartM * cg * cg + bobM * (rodL - cg) * (rodL - cg);
+    const maxF = 3;
+    
+    const dt = 0.0001;
+    let t = 0;
+    
+    let x = 0;
+    let dx = 0;
+    let theta = 1.4;  // CCW from right
+    let dtheta = 0;
+    
+    function e() {
+      const e1 = (theta - Math.PI / 2) % (Math.PI * 2);
+      if (e1 > Math.PI) return e1 - Math.PI * 2;
+      return e1;
+    }
+    
+    function noise(x) {
+      return 0.01 * (Math.random() - 0.5) + 0.01 * (Math.random() - 0.5) + 0.01 * (Math.random() - 0.5) + x;
+    }
+    
+    let lastXForce = 0;
+    function xForce() {
+      const target = (
+        - noise(e()) * 10000 
+        - noise(dtheta) * 100000
+        + noise(x) * 10000
+        + noise(dx) * 100000);
+      const clampedTarget = Math.max(-maxF, Math.min(maxF, target));
+      const result = Math.max(lastXForce - 3 * dt, Math.min(lastXForce + 3 * dt, clampedTarget));
+      lastXForce = result;
+      return result;
+    }
+    
+    function accels() {
+      // cart right is positive
+      // rod towards the bob is positive
+      // cartx to compression : cos(theta)
+      // cartx and torque : sin(theta) * cg
+      // gravity to tension : sin(theta)
+      // gravity and torque : cos(theta) * (rodL - cg)
+      const Fg = -9.81 * bobM;
+      const Tnet = Math.sin(theta) * cg * xForce() + Math.cos(theta) * (rodL - cg) * Fg;
+      const Frod = Math.cos(theta) * xForce() + Math.sin(theta) * Fg;
+      const Fnet = xForce() - Math.sin(theta) * Tnet + Math.cos(theta) * Frod;
+      const ddx = Fnet / cartM;
+      const ddtheta = Tnet / J;
+      return {ddx, ddtheta};
+    }
+    
+    // Fixed time step dt
+    function simulate() {
+      // Verlet integration
+      
+      // 1
+      const accels0 = accels();
+      const dx1 = dx + accels0.ddx / 2 * dt;
+      const dtheta1 = dtheta + accels0.ddtheta / 2 * dt;
+      
+      // 2
+      x += dx1 * dt;
+      theta += dtheta1 * dt;
+      
+      // 3
+      const accels2 = accels();
+      const ddx2 = accels2.ddx;
+      const ddtheta2 = accels2.ddtheta;
+      
+      // 4
+      dx = dx1 + ddx2 / 2 * dt;
+      dtheta = dtheta1 + ddtheta2 / 2 * dt;
+    }
+    
+    function draw() {
+      const cartCvsX = 900 + x * 1000;
+      const cartCvsY = 450;
+      const bobCvsX = cartCvsX + Math.cos(theta) * 400;
+      const bobCvsY = cartCvsY - Math.sin(theta) * 400;
+      
+      ctx.clearRect(0, 0, cvs.width, cvs.height);
+      ctx.fillStyle = "gray";
+      ctx.beginPath();
+      ctx.rect(cartCvsX - 50, cartCvsY - 20, 100, 40);
+      ctx.fill();
+      ctx.fillStyle = "black";
+      ctx.beginPath();
+      ctx.arc(cartCvsX + 30, cartCvsY + 20, 12, 0, 2 * Math.PI);
+      ctx.arc(cartCvsX - 30, cartCvsY + 20, 12, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      ctx.fillStyle = "blue";
+      ctx.beginPath();
+      ctx.arc(cartCvsX, cartCvsY, 5, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.lineWidth = 10;
+      ctx.strokeStyle = "blue";
+      ctx.beginPath();
+      ctx.moveTo(cartCvsX, cartCvsY);
+      ctx.lineTo(bobCvsX, bobCvsY);
+      ctx.stroke();
+      
+      ctx.fillStyle = "gray";
+      ctx.beginPath();
+      ctx.arc(bobCvsX, bobCvsY, 20, 0, 2 * Math.PI);
+      ctx.fill();
+      
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "red";
+      ctx.beginPath();
+      ctx.moveTo(900, 10);
+      ctx.lineTo(900 + xForce() * 900 / maxF, 10);
+      ctx.stroke();
+    }
+    
+    function step(T) {
+      requestAnimationFrame(step);
+      
+      // Physics
+      for (; t < T; t += 1000 * dt) {
+        simulate();
+      }
+      
+      console.log(e());
+      draw();
+    }
+    requestAnimationFrame(step);
+  </script><br>
+  Pendulum is 0.4 m long. Cart is 0.4 kg, bob is 0.1 kg.
+</body>
